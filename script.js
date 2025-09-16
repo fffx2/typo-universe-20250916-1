@@ -76,10 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Failed to initialize app:', error);
             aiMessage.innerHTML = `<span style="color:red;">시스템 초기화 중 오류가 발생했습니다. 페이지를 새로고침해주세요.</span>`;
-            document.querySelectorAll('.dropdown-item').forEach(item => {
-                item.style.pointerEvents = 'none';
-                item.style.opacity = 0.5;
-            });
+            document.querySelectorAll('.dropdown-item').forEach(item => item.style.pointerEvents = 'none');
         }
     }
     
@@ -245,11 +242,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateColorBox(id, color) {
         const element = document.getElementById(id);
         element.style.background = color;
-        const codeElement = element.querySelector('.color-code');
-        codeElement.textContent = color;
+        element.querySelector('.color-code').textContent = color;
         const textColor = getLuminance(color) > 0.4 ? '#333333' : '#FFFFFF';
         element.querySelector('.color-label').style.color = textColor;
-        codeElement.style.color = textColor;
+        element.querySelector('.color-code').style.color = textColor;
     }
 
     // --- Lab 페이지 로직 ---
@@ -264,23 +260,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const textColorPicker = document.getElementById('text-color-picker');
         const lineHeightInput = document.getElementById('line-height-input');
         const fontSizeInput = document.getElementById('font-size-input');
-        
+        const normalRadio = document.getElementById('normal');
+        const redgreenRadio = document.getElementById('redgreen');
+
         const updateAll = () => {
             updateContrastDisplay();
             updateFontUnits();
             updateUniversalColorDisplay();
         };
 
-        bgColorInput.addEventListener('input', (e) => { bgColorPicker.value = e.target.value.toUpperCase(); updateAll(); });
-        bgColorPicker.addEventListener('input', (e) => { bgColorInput.value = e.target.value.toUpperCase(); updateAll(); });
-        textColorInput.addEventListener('input', (e) => { textColorPicker.value = e.target.value.toUpperCase(); updateAll(); });
-        textColorPicker.addEventListener('input', (e) => { textColorInput.value = e.target.value.toUpperCase(); updateAll(); });
+        bgColorInput.addEventListener('input', (e) => { bgColorPicker.value = e.target.value; updateAll(); });
+        bgColorPicker.addEventListener('input', (e) => { bgColorInput.value = e.target.value; updateAll(); });
+        textColorInput.addEventListener('input', (e) => { textColorPicker.value = e.target.value; updateAll(); });
+        textColorPicker.addEventListener('input', (e) => { textColorInput.value = e.target.value; updateAll(); });
         lineHeightInput.addEventListener('input', updateContrastDisplay);
         fontSizeInput.addEventListener('input', updateFontUnits);
-        
-        document.querySelectorAll('input[name="cbType"]').forEach(radio => {
-            radio.addEventListener('change', updateUniversalColorDisplay);
-        });
+        normalRadio.addEventListener('change', updateUniversalColorDisplay);
+        redgreenRadio.addEventListener('change', updateUniversalColorDisplay);
         
         updateAll();
         labInitialized = true;
@@ -292,11 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('text-color-input').value = textColor;
         document.getElementById('text-color-picker').value = textColor;
         document.getElementById('font-size-input').value = fontSize;
-        if(labInitialized) {
-            updateContrastDisplay();
-            updateFontUnits();
-            updateUniversalColorDisplay();
-        }
     }
     
     function updateContrastDisplay() {
@@ -335,12 +326,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateUniversalColorDisplay() {
         const bgColor = document.getElementById('bg-color-input').value;
         const textColor = document.getElementById('text-color-input').value;
-        const isRedGreenSim = document.getElementById('redgreen').checked;
+        const cbType = document.querySelector('input[name="cbType"]:checked').value;
 
         updateSimColorBox('origBg', bgColor);
         updateSimColorBox('origText', textColor);
 
-        if (isRedGreenSim) {
+        if (cbType === 'redgreen') {
             const simBgColor = simulateColor(bgColor);
             const simTextColor = simulateColor(textColor);
             updateSimColorBox('simBg', simBgColor);
@@ -350,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             updateSimColorBox('simBg', bgColor);
             updateSimColorBox('simText', textColor);
-            document.getElementById('solution-text').innerHTML = "일반 시각으로 색상을 보고 있습니다. 적록색약 시각으로 전환하여 접근성을 확인해 보세요.";
+            document.getElementById('solution-text').innerHTML = "일반 시각으로 색상을 보고 있습니다. 색약 시뮬레이션을 통해 접근성을 확인해 보세요.";
         }
     }
 
@@ -360,26 +351,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const hexSim = box.querySelector('.hex-code-sim');
         hexSim.textContent = color.toUpperCase();
         const label = box.querySelector('.palette-label');
-        const adaptiveColor = getLuminance(color) > 0.4 ? 'rgba(0,0,0,0.8)' : '#FFFFFF';
+        const adaptiveColor = getLuminance(color) > 0.4 ? '#333333' : '#FFFFFF';
         hexSim.style.color = adaptiveColor;
         label.style.color = adaptiveColor;
     }
 
     function simulateColor(hex) {
-        const matrix = [0.625, 0.375, 0, 0.7, 0.3, 0, 0, 0.3, 0.7];
+        const matrix = {
+            redgreen: [0.625, 0.375, 0, 0.7, 0.3, 0, 0, 0.3, 0.7]
+        };
         const rgb = hexToRgb(hex);
         if (!rgb) return hex;
         const [r, g, b] = rgb;
-        const simR = r * matrix[0] + g * matrix[1] + b * matrix[2];
-        const simG = r * matrix[3] + g * matrix[4] + b * matrix[5];
-        const simB = r * matrix[6] + g * matrix[7] + b * matrix[8];
+        const m = matrix.redgreen;
+        const simR = Math.round(r * m[0] + g * m[1] + b * m[2]);
+        const simG = Math.round(r * m[3] + g * m[4] + b * m[5]);
+        const simB = Math.round(r * m[6] + g * m[7] + b * m[8]);
         return rgbToHexFromArr([simR, simG, simB]);
     }
 
     function getSolutionText(ratio) {
-        if (ratio < 3.0) return `<span style='color: #d9534f; font-weight: 600;'>🚨 대비 부족:</span> 시뮬레이션 대비율이 ${ratio}:1로 매우 낮아 구분이 어렵습니다. 색상 밝기를 조정하세요.`;
-        if (ratio < 4.5) return `<span style='color: #f0ad4e; font-weight: 600;'>⚠️ 개선 필요:</span> 시뮬레이션 대비율이 ${ratio}:1로 다소 낮습니다. WCAG AA 기준(4.5:1) 이상을 권장합니다.`;
-        return `<span style='color: #5cb85c; font-weight: 600;'>✅ 양호:</span> 시뮬레이션 대비율이 ${ratio}:1로 충분합니다.`;
+        if (ratio < 3.0) return `<span style='color: #f44336; font-weight: 600;'>🚨 대비 부족:</span> 시뮬레이션 대비율이 ${ratio}:1로 매우 낮아 구분이 어렵습니다. 색상 밝기를 조정하세요.`;
+        if (ratio < 4.5) return `<span style='color: #ff9800; font-weight: 600;'>⚠️ 개선 필요:</span> 시뮬레이션 대비율이 ${ratio}:1로 다소 낮습니다. WCAG AA 기준(4.5:1) 이상을 권장합니다.`;
+        return `<span style='color: #4caf50; font-weight: 600;'>✅ 양호:</span> 시뮬레이션 대비율이 ${ratio}:1로 충분합니다.`;
     }
     
     // --- 유틸리티 함수 ---
@@ -438,30 +432,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const [r, g, b] = hexToRgb(color);
         return rgbToHexFromArr([255 - r, 255 - g, 255 - b]);
     }
-    
-    function updateAIMessage(message) {
-        const container = document.getElementById('ai-message');
-        let i = 0;
-        container.innerHTML = "";
-        const speed = 20;
-
-        function typeWriter() {
-            if (i < message.length) {
-                container.innerHTML += message.charAt(i);
-                i++;
-                setTimeout(typeWriter, speed);
-            }
-        }
-        typeWriter();
-    }
 
     initializeApp();
-    
-    document.addEventListener('click', function(event) {
-        if (!event.target.closest('.dropdown-wrapper')) {
-            document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                menu.classList.remove('show');
-            });
-        }
-    });
 });
