@@ -24,3 +24,163 @@
     "live-server": "^1.2.2"
   }
 }
+{
+  "guidelines": {
+    "ios": {
+      "source": "Apple Human Interface Guidelines",
+      "font": {
+        "family": "SF Pro Display",
+        "unit": "pt",
+        "keyFeature": "Dynamic Type"
+      },
+      "typeScale": {
+        "body": "17pt",
+        "min": "12pt (Footnote)",
+        "largeTitle": "34pt"
+      },
+      "lineHeight": "1.6",
+      "contrast": "WCAG 2.1 AA (4.5:1) 기준을 엄격히 준수",
+      "link": "https://developer.apple.com/design/human-interface-guidelines/typography"
+    },
+    "ipados": {
+      "source": "Apple Human Interface Guidelines",
+      "font": {
+        "family": "SF Pro Display",
+        "unit": "pt",
+        "keyFeature": "Dynamic Type"
+      },
+      "typeScale": {
+        "body": "17pt",
+        "min": "12pt (Footnote)",
+        "largeTitle": "34pt"
+      },
+      "lineHeight": "1.6",
+      "contrast": "WCAG 2.1 AA (4.5:1) 기준을 엄격히 준수",
+      "link": "https://developer.apple.com/design/human-interface-guidelines/typography"
+    },
+    "android": {
+      "source": "Google Material Design 3",
+      "font": {
+        "family": "Roboto",
+        "unit": "sp",
+        "keyFeature": "Scale-independent Pixels"
+      },
+      "typeScale": {
+        "body": "16sp (Body Large)",
+        "min": "12sp (Body Small)",
+        "headline": "34sp"
+      },
+      "lineHeight": "1.5",
+      "contrast": "WCAG 2.1 AA (4.5:1) 기준",
+      "link": "https://m3.material.io/styles/typography/type-scale-tokens"
+    },
+    "tablet": {
+      "source": "Google Material Design 3",
+      "font": {
+        "family": "Roboto",
+        "unit": "sp",
+        "keyFeature": "Scale-independent Pixels"
+      },
+      "typeScale": {
+        "body": "16sp (Body Large)",
+        "min": "12sp (Body Small)",
+        "headline": "34sp"
+      },
+      "lineHeight": "1.5",
+      "contrast": "WCAG 2.1 AA (4.5:1) 기준",
+      "link": "https://m3.material.io/styles/typography/type-scale-tokens"
+    },
+    "web": {
+      "source": "W3C Web Standards / MDN",
+      "font": {
+        "family": "Inter",
+        "unit": "rem / px",
+        "keyFeature": "Responsive Design"
+      },
+      "typeScale": {
+        "body": "16px (1rem)",
+        "min": "14px (권장)",
+        "h1": "2.5rem"
+      },
+      "lineHeight": "1.6",
+      "contrast": "WCAG 2.1 AA (4.5:1) 기준",
+      "link": "https://developer.mozilla.org/en-US/docs/Web/CSS/font-size"
+    },
+    "desktop": {
+      "source": "Microsoft Fluent Design System",
+      "font": {
+        "family": "Segoe UI",
+        "unit": "epx",
+        "keyFeature": "Effective Pixels"
+      },
+      "typeScale": {
+        "body": "14px",
+        "min": "12px (Caption)",
+        "title": "20px"
+      },
+      "lineHeight": "1.5",
+      "contrast": "WCAG 2.1 AA (4.5:1) 기준",
+      "link": "https://learn.microsoft.com/en-us/windows/apps/design/style/typography"
+    },
+    "watchos": {
+      "source": "Apple Human Interface Guidelines",
+      "font": {
+        "family": "SF Compact",
+        "unit": "pt",
+        "keyFeature": "Glanceable Information"
+      },
+      "typeScale": {
+        "body": "16pt",
+        "min": "13pt (Footnote)"
+      },
+      "lineHeight": "1.4",
+      "contrast": "WCAG 2.1 AA (4.5:1) 기준을 엄격히 준수",
+      "link": "https://developer.apple.com/design/human-interface-guidelines/typography"
+    },
+    "wearable": {
+      "source": "Google Wear OS Design",
+      "font": {
+        "family": "Roboto",
+        "unit": "sp",
+        "keyFeature": "Glanceable Information"
+      },
+      "typeScale": {
+        "body": "15sp (Body Medium)",
+        "min": "12sp (Body Small)"
+      },
+      "lineHeight": "1.4",
+      "contrast": "WCAG 2.1 AA (4.5:1) 기준",
+      "link": "https://developer.android.com/design/ui/wear-os/typography"
+    },
+    "vr": {
+      "source": "Meta Quest Design Best Practices",
+      "font": {
+        "family": "Roboto",
+        "unit": "px (at 2m distance)",
+        "keyFeature": "Distance-dependent size"
+      },
+      "typeScale": {
+        "body": "32px",
+        "min": "24px"
+      },
+      "lineHeight": "1.2",
+      "contrast": "High contrast is critical",
+      "link": "https://creator.oculus.com/design/design-best-practices/"
+    },
+    "ar": {
+      "source": "Microsoft MRTK Design (HoloLens)",
+      "font": {
+        "family": "Segoe UI",
+        "unit": "epx (at 2m distance)",
+        "keyFeature": "Distance-dependent size"
+      },
+      "typeScale": {
+        "body": "36px",
+        "min": "24px"
+      },
+      "lineHeight": "1.2",
+      "contrast": "High contrast is critical",
+      "link": "https://learn.microsoft.com/en-us/windows/mixed-reality/mrtk-unity/mrtk2/features/ux-building-blocks/text"
+    }
+  }
+}
