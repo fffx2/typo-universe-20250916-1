@@ -60,12 +60,19 @@ body {
 }
 
 /* Main Content Layout */
-.main-content {
+#main-page .main-content {
     display: grid;
     grid-template-columns: 1fr 1.5fr;
     gap: 60px;
     margin-bottom: 60px;
 }
+
+/* ======[ 핵심 수정 사항 ]====== */
+#lab-page .main-content {
+    display: block; /* Lab 페이지는 1단 레이아웃으로 변경 */
+}
+/* ============================ */
+
 
 /* Step Sections */
 .step-section { margin-bottom: 50px; }
@@ -135,7 +142,7 @@ body {
 
 /* Keyword Tags & Color Selection */
 .keyword-tags { display: flex; flex-wrap: wrap; gap: 10px; }
-.tag { padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent; }
+.tag { padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent; background-color: #f0f0f0; color: #666;}
 .tag:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
 .tag.selected { border-color: #6666ff; background-color: #6666ff; color: white; transform: scale(1.05); }
 .color-selection { display: flex; gap: 15px; margin-top: 20px; }
@@ -185,6 +192,7 @@ body {
 .status-badge.fail { background: #f44336; color: white; }
 .text-preview { padding: 30px; border-radius: 8px; margin-bottom: 20px; transition: all 0.3s; }
 .preview-title { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+.preview-body { font-size: 16px; }
 .font-size-input-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
 .font-size-input-wrapper input { width: 80px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; text-align: center; font-size: 16px; }
 .font-unit-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
@@ -215,6 +223,7 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
-    .main-content, .color-inputs, .bottom-guidelines, .font-unit-cards, .simulator-display { grid-template-columns: 1fr; gap: 20px; }
+    #main-page .main-content, .color-inputs, .bottom-guidelines, .font-unit-cards, .simulator-display { grid-template-columns: 1fr; gap: 20px; }
     .header { flex-direction: column; gap: 20px; text-align: center; }
+    .typography-content { grid-template-columns: 1fr; }
 }

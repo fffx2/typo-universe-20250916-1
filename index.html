@@ -135,97 +135,95 @@
 
         <div id="lab-page" class="lab-page hidden">
             <div class="main-content">
-                <div class="left-section">
-                    <div class="contrast-test">
-                        <h2 class="section-header-lab">색상 대비 실시간 테스트</h2>
-                        <div class="color-inputs">
-                            <div class="input-group">
-                                <label>Background color</label>
-                                <div class="color-input-wrapper">
-                                    <input type="text" class="color-input" id="bg-color-input" value="#F5F5F5">
-                                    <input type="color" class="color-picker" id="bg-color-picker" value="#F5F5F5">
-                                </div>
-                            </div>
-                            <div class="input-group">
-                                <label>Text color</label>
-                                <div class="color-input-wrapper">
-                                    <input type="text" class="color-input" id="text-color-input" value="#333333">
-                                    <input type="color" class="color-picker" id="text-color-picker" value="#333333">
-                                </div>
-                            </div>
-                             <div class="input-group">
-                                <label>Line height</label>
-                                <div class="slider-container lab-slider">
-                                    <input type="range" class="slider" min="1" max="2.5" step="0.1" value="1.6" id="line-height-input">
-                                    <div style="text-align: center; margin-top: 5px;"><span id="line-height-value">1.6</span></div>
-                                </div>
+                <div class="contrast-test">
+                    <h2 class="section-header-lab">색상 대비 실시간 테스트</h2>
+                    <div class="color-inputs">
+                        <div class="input-group">
+                            <label>Background color</label>
+                            <div class="color-input-wrapper">
+                                <input type="text" class="color-input" id="bg-color-input" value="#F5F5F5">
+                                <input type="color" class="color-picker" id="bg-color-picker" value="#F5F5F5">
                             </div>
                         </div>
-                        <div class="contrast-display">
-                            <div class="contrast-ratio-wrapper">
-                                <div style="font-size: 12px; color: #666; margin-bottom: 5px;">텍스트-배경 명도대비</div>
-                                <div class="contrast-ratio" id="contrast-ratio">12.36 : 1</div>
-                            </div>
-                            <div class="contrast-status-wrapper">
-                                <div class="contrast-status">
-                                    <span class="status-badge pass" id="aa-status">AA</span>
-                                    <span class="status-badge pass" id="aaa-status">AAA</span>
-                                </div>
-                                <p class="contrast-info">WCAG 2.1 기준, 일반 텍스트는 4.5:1(AA), 7:1(AAA) 이상이어야 합니다.</p>
+                        <div class="input-group">
+                            <label>Text color</label>
+                            <div class="color-input-wrapper">
+                                <input type="text" class="color-input" id="text-color-input" value="#333333">
+                                <input type="color" class="color-picker" id="text-color-picker" value="#333333">
                             </div>
                         </div>
-                        <div class="text-preview" id="text-preview">
-                            <div class="preview-title">This is a Large Text Preview</div>
-                            <div class="preview-body">This is a regular text preview. Adjust colors to check the contrast ratio.</div>
+                         <div class="input-group">
+                            <label>Line height</label>
+                            <div class="slider-container lab-slider">
+                                <input type="range" class="slider" min="1" max="2.5" step="0.1" value="1.6" id="line-height-input">
+                                <div style="text-align: center; margin-top: 5px;"><span id="line-height-value">1.6</span></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="bottom-font-units">
-                        <h2 class="section-header-lab">플랫폼별 폰트 단위 비교</h2>
-                        <div class="font-size-input-wrapper">
-                            <label for="font-size-input">Font size</label>
-                            <input type="number" id="font-size-input" value="16">
-                            <span>px (기준)</span>
+                    <div class="contrast-display">
+                        <div class="contrast-ratio-wrapper">
+                            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">텍스트-배경 명도대비</div>
+                            <div class="contrast-ratio" id="contrast-ratio">12.36 : 1</div>
                         </div>
-                        <div class="font-unit-cards">
-                            <div class="font-unit-card"><h4>pt (for iOS)</h4><p class="font-example" id="pt-example">Text</p></div>
-                            <div class="font-unit-card"><h4>rem (for Web)</h4><p class="font-example" id="rem-example">Text</p></div>
-                            <div class="font-unit-card"><h4>sp (for Android)</h4><p class="font-example" id="sp-example">Text</p></div>
+                        <div class="contrast-status-wrapper">
+                            <div class="contrast-status">
+                                <span class="status-badge pass" id="aa-status">AA</span>
+                                <span class="status-badge pass" id="aaa-status">AAA</span>
+                            </div>
+                            <p class="contrast-info">WCAG 2.1 기준, 일반 텍스트는 4.5:1(AA), 7:1(AAA) 이상이어야 합니다.</p>
                         </div>
+                    </div>
+                    <div class="text-preview" id="text-preview">
+                        <div class="preview-title">대형 텍스트는 일반 글자인 경우 18pt(24px) 이상,</div>
+                        <div class="preview-body">굵은 글꼴일 경우 14pt 이상에 적용 됩니다.</div>
                     </div>
                 </div>
-                <div class="right-section">
-                     <div class="universal-color-system">
-                        <h2 class="section-header-lab">색약자를 위한 유니버설 컬러 시스템</h2>
-                        <div class="colorblind-selector">
-                            <div class="cb-option">
-                                <input type="radio" id="normal" name="cbType" value="normal" checked>
-                                <label for="normal">일반 시각</label>
-                            </div>
-                            <div class="cb-option">
-                                <input type="radio" id="redgreen" name="cbType" value="redgreen">
-                                <label for="redgreen">적록색약 시각</label>
+                
+                <div class="bottom-font-units">
+                    <h2 class="section-header-lab">플랫폼별 폰트 단위 비교</h2>
+                    <div class="font-size-input-wrapper">
+                        <label for="font-size-input">Font size</label>
+                        <input type="number" id="font-size-input" value="16">
+                        <span>px (기준)</span>
+                    </div>
+                    <div class="font-unit-cards">
+                        <div class="font-unit-card"><h4>pt (for iOS)</h4><p class="font-example" id="pt-example">고정 크기 텍스트 예시</p></div>
+                        <div class="font-unit-card"><h4>rem (for Web)</h4><p class="font-example" id="rem-example">고정 크기 텍스트 예시</p></div>
+                        <div class="font-unit-card"><h4>sp (for Android)</h4><p class="font-example" id="sp-example">고정 크기 텍스트 예시</p></div>
+                    </div>
+                </div>
+
+                <div class="universal-color-system">
+                    <h2 class="section-header-lab">색약자를 위한 유니버설 컬러 시스템</h2>
+                    <div class="colorblind-selector">
+                        <div class="cb-option">
+                            <input type="radio" id="normal" name="cbType" value="normal" checked>
+                            <label for="normal">일반 시각</label>
+                        </div>
+                        <div class="cb-option">
+                            <input type="radio" id="redgreen" name="cbType" value="redgreen">
+                            <label for="redgreen">적록색약 시각</label>
+                        </div>
+                    </div>
+                    <div class="simulator-display">
+                        <div class="simulator-card">
+                            <div class="simulator-title"><span>🎨</span> 원본 색상</div>
+                            <div class="color-palette-sim">
+                                <div class="palette-item" id="origBg"><span class="palette-label">배경</span><span class="hex-code-sim"></span></div>
+                                <div class="palette-item" id="origText"><span class="palette-label">텍스트</span><span class="hex-code-sim"></span></div>
                             </div>
                         </div>
-                        <div class="simulator-display">
-                            <div class="simulator-card">
-                                <div class="simulator-title"><span>🎨</span> 원본 색상</div>
-                                <div class="color-palette-sim">
-                                    <div class="palette-item" id="origBg"><span class="palette-label">배경</span><span class="hex-code-sim"></span></div>
-                                    <div class="palette-item" id="origText"><span class="palette-label">텍스트</span><span class="hex-code-sim"></span></div>
-                                </div>
-                            </div>
-                            <div class="simulator-card">
-                                <div class="simulator-title"><span>🔄</span> 시뮬레이션 결과</div>
-                                <div class="color-palette-sim">
-                                    <div class="palette-item" id="simBg"><span class="palette-label">배경</span><span class="hex-code-sim"></span></div>
-                                    <div class="palette-item" id="simText"><span class="palette-label">텍스트</span><span class="hex-code-sim"></span></div>
-                                </div>
+                        <div class="simulator-card">
+                            <div class="simulator-title"><span>🔄</span> 시뮬레이션 결과</div>
+                            <div class="color-palette-sim">
+                                <div class="palette-item" id="simBg"><span class="palette-label">배경</span><span class="hex-code-sim"></span></div>
+                                <div class="palette-item" id="simText"><span class="palette-label">텍스트</span><span class="hex-code-sim"></span></div>
                             </div>
                         </div>
-                        <div class="solutions-section">
-                            <div class="solution-header">AI 접근성 솔루션</div>
-                            <div id="solution-text"></div>
-                        </div>
+                    </div>
+                    <div class="solutions-section">
+                        <div class="solution-header">AI 접근성 솔루션</div>
+                        <div id="solution-text"></div>
                     </div>
                 </div>
             </div>
