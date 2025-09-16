@@ -451,8 +451,8 @@ console.log('Universal Color System loaded successfully');// Universal Color Sys
 
 // 전역 상태 관리
 let universalColorState = {
-    currentBgColor: '#F5F5F5',
-    currentTextColor: '#333333',
+    currentBgColor: '#F5F5F5',  // lab.html의 기본 배경색
+    currentTextColor: '#333333', // lab.html의 기본 텍스트색
     currentCbType: 'normal',
     currentPattern: 'stripes',
     patternEnabled: false
@@ -465,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 유니버설 컬러 시스템 초기화
 function initializeUniversalColorSystem() {
-    // 기존 색상 입력 필드와 연동
+    // 기존 색상 입력 필드와 연동 및 초기값 설정
     syncWithMainColorInputs();
     
     // 색약 유형 선택 이벤트 리스너
@@ -513,9 +513,9 @@ function syncWithMainColorInputs() {
     const textColorInput = document.getElementById('text-color-input');
     
     if (bgColorInput && textColorInput) {
-        // 초기값 설정
-        universalColorState.currentBgColor = bgColorInput.value;
-        universalColorState.currentTextColor = textColorInput.value;
+        // 초기값 설정 (lab.html의 기본값 사용)
+        universalColorState.currentBgColor = bgColorInput.value || '#F5F5F5';
+        universalColorState.currentTextColor = textColorInput.value || '#333333';
         
         // 색상 변경 감지
         bgColorInput.addEventListener('input', function() {
@@ -548,32 +548,17 @@ function syncWithMainColorInputs() {
     }
 }
 
-// 색약 시뮬레이션 매트릭스
+// 색약 시뮬레이션 매트릭스 (간소화: 적록색약만)
 const colorBlindnessMatrices = {
     normal: [
         [1, 0, 0],
         [0, 1, 0],
         [0, 0, 1]
     ],
-    protanopia: [ // 적색맹
-        [0.567, 0.433, 0],
-        [0.558, 0.442, 0],
-        [0, 0.242, 0.758]
-    ],
-    deuteranopia: [ // 녹색맹
+    redgreen: [ // 적록색약 (가장 흔한 유형 - Deuteranopia 기준)
         [0.625, 0.375, 0],
         [0.7, 0.3, 0],
         [0, 0.3, 0.7]
-    ],
-    tritanopia: [ // 청색맹
-        [0.95, 0.05, 0],
-        [0, 0.433, 0.567],
-        [0, 0.475, 0.525]
-    ],
-    achromatopsia: [ // 전색맹
-        [0.299, 0.587, 0.114],
-        [0.299, 0.587, 0.114],
-        [0.299, 0.587, 0.114]
     ]
 };
 

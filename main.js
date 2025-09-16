@@ -116,7 +116,18 @@ function checkStep1Complete() {
     if (appState.service && appState.platform) {
         // 서비스와 플랫폼 모두 선택되면 STEP 02 표시
         document.getElementById('step02').classList.remove('hidden');
-        updateAIMessage("훌륭한 선택입니다! 이제 서비스의 핵심 분위기를 정해볼까요? 두 개의 슬라이더를 조절하여 원하는 무드를 찾아주세요.");
+        
+        // 플랫폼에 맞는 폰트 크기 추천 메시지
+        const platformKey = appState.platform.toLowerCase();
+        const platformGuide = knowledgeBase.guidelines[platformKey];
+        
+        if (platformGuide) {
+            updateAIMessage(`${appState.platform} 플랫폼을 선택하셨군요! ${platformGuide.description} 
+            권장 본문 크기는 ${platformGuide.defaultSize}이며, 최소 ${platformGuide.minimumSize} 이상을 유지해야 합니다. 
+            이제 서비스의 핵심 분위기를 정해볼까요?`);
+        } else {
+            updateAIMessage("훌륭한 선택입니다! 이제 서비스의 핵심 분위기를 정해볼까요? 두 개의 슬라이더를 조절하여 원하는 무드를 찾아주세요.");
+        }
     }
 }
 
@@ -232,7 +243,6 @@ function selectColor(color) {
     updateAIMessage("최고의 선택입니다! 이 색상을 기준으로 Primary와 Secondary 컬러 팔레트를 생성합니다.");
 }
 
-
 // ==================== STEP 04: AI 가이드 생성 ====================
 // AI 가이드 생성 버튼 클릭 이벤트
 document.getElementById('generate-btn').addEventListener('click', async () => {
@@ -272,6 +282,10 @@ document.getElementById('generate-btn').addEventListener('click', async () => {
 
 // 로컬에서 가이드 생성 (API 실패 시 대체)
 function generateLocalReport() {
+    // 선택된 플랫폼의 가이드라인 가져오기
+    const platformKey = appState.platform.toLowerCase();
+    const platformGuide = knowledgeBase.guidelines[platformKey] || knowledgeBase.guidelines.web;
+    
     // 선택된 색상 기반으로 팔레트 생성
     const primary = appState.primaryColor;
     const primaryLight = lightenColor(primary, 20);
@@ -287,9 +301,10 @@ function generateLocalReport() {
             secondary: { main: secondary, light: secondaryLight, dark: secondaryDark }
         },
         typography: {
-            bodySize: '16pt',
-            headlineSize: '24pt',
-            lineHeight: '1.6'
+            bodySize: platformGuide.defaultSize,
+            headlineSize: platformGuide.typeScale.headline || platformGuide.typeScale.largeTitle || '24pt',
+            lineHeight: platformGuide.lineHeight,
+            minimumSize: platformGuide.minimumSize
         },
         accessibility: {
             textColorOnPrimary: '#ffffff',
@@ -308,7 +323,12 @@ function displayGeneratedGuide(data) {
     document.getElementById('ai-report').style.display = 'block';
     document.getElementById('guidelines').style.display = 'grid';
     
-    updateAIMessage(`${appState.platform} 플랫폼에 최적화된 디자인 가이드가 생성되었습니다!`);
+    const platformKey = appState.platform.toLowerCase();
+    const platformGuide = knowledgeBase.guidelines[platformKey];
+    
+    updateAIMessage(`${appState.platform} 플랫폼에 최적화된 디자인 가이드가 생성되었습니다! 
+        본문 텍스트는 ${data.typography.bodySize}, 헤드라인은 ${data.typography.headlineSize}를 사용하세요. 
+        ${platformGuide ? platformGuide.font.keyFeature + '를 활용하여 더 나은 사용자 경험을 제공할 수 있습니다.' : ''}`);
     
     // 실험실 링크에 색상 정보 추가
     const labLink = document.getElementById('lab-link');
@@ -316,7 +336,6 @@ function displayGeneratedGuide(data) {
     const textColor = encodeURIComponent(data.accessibility.textColorOnPrimary);
     labLink.href = `./lab.html?bg=${primaryColor}&text=${textColor}`;
 }
-
 
 // 생성된 색상 팔레트 표시
 function updateColorDisplay() {
@@ -341,13 +360,20 @@ function updateColorDisplay() {
 
 // 생성된 타이포그래피 정보 표시
 function updateTypographyDisplay(typography, accessibility) {
-    const platformGuide = knowledgeBase.guidelines[appState.platform.toLowerCase()] || knowledgeBase.guidelines.web;
+    const platformKey = appState.platform.toLowerCase();
+    const platformGuide = knowledgeBase.guidelines[platformKey] || knowledgeBase.guidelines.web;
     
-    document.getElementById('contrast-description').innerHTML = `Primary 색상을 배경으로 사용할 경우, WCAG AA 기준을 충족하는 텍스트 색상은 <strong>${accessibility.textColorOnPrimary}</strong>이며, 대비는 <strong>${accessibility.contrastRatio}</strong>입니다.`;
+    document.getElementById('contrast-description').innerHTML = `
+        Primary 색상을 배경으로 사용할 경우, WCAG AA 기준을 충족하는 텍스트 색상은 
+        <strong>${accessibility.textColorOnPrimary}</strong>이며, 대비는 <strong>${accessibility.contrastRatio}</strong>입니다.`;
     
-    document.getElementById('font-size-description').innerHTML = `<strong>${typography.bodySize}</strong> (Body) / <strong>${typography.headlineSize}</strong> (Large Title) / <strong>${platformGuide.font.unit}</strong> 단위 사용`;
+    document.getElementById('font-size-description').innerHTML = `
+        <strong>${typography.bodySize}</strong> (본문) / 
+        <strong>${typography.headlineSize}</strong> (헤드라인)<br>
+        최소 크기: <strong>${typography.minimumSize}</strong> / 
+        단위: <strong>${platformGuide.font.unit}</strong><br>
+        <span style="font-size: 12px; color: #888;">${platformGuide.source}</span>`;
 }
-
 
 // AI 메시지 업데이트 (타이핑 효과 적용)
 function updateAIMessage(message) {
