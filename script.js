@@ -1,505 +1,561 @@
-// ===================================================================================
-// INITIALIZATION & GLOBAL STATE
-// ===================================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const mainPage = document.getElementById('main-page');
+    const labPage = document.getElementById('lab-page');
+    const navLinks = document.querySelectorAll('.nav-link');
 
-// 전역 상태 관리 객체
-let appState = {
-    service: '',
-    platform: '',
-    mood: { soft: 50, static: 50 },
-    keyword: '',
-    primaryColor: '',
-    generatedResult: null // 생성된 최종 결과 저장
-};
-
-// 지식 베이스 데이터 저장 변수
-let knowledgeBase = {};
-
-document.addEventListener('DOMContentLoaded', initializeApp);
-
-async function initializeApp() {
-    try {
-        const response = await fetch('./knowledge_base.json');
-        if (!response.ok) throw new Error('Network response was not ok');
-        knowledgeBase = await response.json();
-        
-        setupNavigation();
-        initializeMainPage();
-        initializeLabPage();
-
-    } catch (error) {
-        console.error('Failed to initialize app:', error);
-        updateAIMessage("시스템 초기화 중 오류가 발생했습니다. 페이지를 새로고침해주세요.");
-    }
-}
-
-
-// ===================================================================================
-// NAVIGATION
-// ===================================================================================
-
-function setupNavigation() {
-    const navLinks = document.querySelectorAll('.nav-link, .interactive-button');
+    // Navigation
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            const targetId = e.currentTarget.dataset.target;
-            
-            document.querySelectorAll('.main-page, .lab-page').forEach(page => {
-                page.classList.remove('active');
-                page.classList.add('hidden');
-            });
-            
-            const targetPage = document.getElementById(targetId);
-            if(targetPage) {
-                targetPage.classList.remove('hidden');
-                targetPage.classList.add('active');
-            }
+            const targetId = e.target.dataset.target;
 
-            document.querySelectorAll('.nav-link').forEach(nav => {
-                nav.classList.toggle('active', nav.dataset.target === targetId);
-            });
+            navLinks.forEach(nav => nav.classList.remove('active'));
+            e.target.classList.add('active');
 
-            // If navigating to lab, pass generated data
-            if (targetId === 'lab-page' && appState.generatedResult) {
-                const { bgColor, textColor, fontSize } = appState.generatedResult;
-                updateLabPageWithData(bgColor, textColor, fontSize);
+            if (targetId === 'main-page') {
+                mainPage.classList.add('active');
+                labPage.classList.remove('active');
+            } else {
+                labPage.classList.add('active');
+                mainPage.classList.remove('active');
+                // Lab 페이지 로드 시 필요한 초기화
+                initializeLabPage();
             }
         });
     });
-}
 
-
-// ===================================================================================
-// MAIN PAGE LOGIC (STEP 1, 2, 3 복구)
-// ===================================================================================
-
-function initializeMainPage() {
-    initializeDropdowns();
-    initializeSliders();
-    document.getElementById('generate-btn').addEventListener('click', generateGuide);
-    updateAIMessage("안녕하세요! TYPOUNIVERSE AI Design Assistant입니다. 어떤 프로젝트를 위한 디자인 가이드를 찾으시나요? 먼저 서비스의 목적과 타겟 플랫폼을 알려주세요.");
-}
-
-function initializeDropdowns() {
-    const services = ['포트폴리오', '브랜드 홍보', '제품 판매', '정보 전달', '학습', '엔터테인먼트'];
-    const platforms = ['iOS', 'Android', 'Web', 'Desktop', 'Tablet', 'Wearable', 'VR'];
-    
-    populateDropdown('service', services);
-    populateDropdown('platform', platforms);
-
-    document.getElementById('service-dropdown').addEventListener('click', () => toggleDropdown('service'));
-    document.getElementById('platform-dropdown').addEventListener('click', () => toggleDropdown('platform'));
-}
-
-function populateDropdown(type, options) {
-    const menu = document.getElementById(`${type}-menu`);
-    menu.innerHTML = '';
-    options.forEach(optionText => {
-        const option = document.createElement('div');
-        option.className = 'dropdown-option';
-        option.textContent = optionText;
-        option.onclick = () => selectOption(type, optionText);
-        menu.appendChild(option);
-    });
-}
-
-function toggleDropdown(type) {
-    document.getElementById(`${type}-menu`).classList.toggle('show');
-}
-
-function selectOption(type, value) {
-    document.getElementById(`${type}-text`).textContent = value;
-    document.getElementById(`${type}-dropdown`).classList.add('selected');
-    appState[type] = value;
-    toggleDropdown(type);
-
-    if (appState.service && appState.platform) {
-        document.getElementById('step02').classList.remove('hidden');
-        const platformKey = appState.platform.toLowerCase();
-        const platformGuide = knowledgeBase.guidelines[platformKey];
-        if (platformGuide) {
-            updateAIMessage(`${appState.platform} 플랫폼을 선택하셨군요! ${platformGuide.description} 권장 본문 크기는 ${platformGuide.defaultSize}입니다. 이제 서비스의 핵심 분위기를 정해주세요.`);
-        }
-    }
-}
-
-function initializeSliders() {
+    // Main Page Logic
+    const serviceDropdown = document.getElementById('service-dropdown');
+    const serviceMenu = document.getElementById('service-menu');
+    const serviceText = document.getElementById('service-text');
+    const platformDropdown = document.getElementById('platform-dropdown');
+    const platformMenu = document.getElementById('platform-menu');
+    const platformText = document.getElementById('platform-text');
     const softHardSlider = document.getElementById('soft-hard-slider');
     const staticDynamicSlider = document.getElementById('static-dynamic-slider');
-    
-    const updateMoodAndKeywords = () => {
-        appState.mood.soft = parseInt(softHardSlider.value);
-        appState.mood.static = parseInt(staticDynamicSlider.value);
-        
-        if (Math.abs(appState.mood.soft - 50) > 10 || Math.abs(appState.mood.static - 50) > 10) {
-            document.getElementById('step03').classList.remove('hidden');
-            renderKeywords();
-        }
-    };
-    
-    softHardSlider.addEventListener('input', updateMoodAndKeywords);
-    staticDynamicSlider.addEventListener('input', updateMoodAndKeywords);
-}
+    const keywordTagsContainer = document.getElementById('keyword-tags');
+    const colorSelectionWrapper = document.getElementById('color-selection-wrapper');
+    const colorSelection = document.getElementById('color-selection');
+    const generateBtn = document.getElementById('generate-btn');
+    const aiMessage = document.getElementById('ai-message');
+    const aiReport = document.getElementById('ai-report');
+    const guidelines = document.getElementById('guidelines');
 
-function renderKeywords() {
-    const { soft, static: staticMood } = appState.mood;
-    let group = (soft < 40 && staticMood >= 60) ? 'group1' :
-                (soft < 40 && staticMood < 40) ? 'group2' :
-                (soft >= 60 && staticMood < 40) ? 'group3' :
-                (soft >= 60 && staticMood >= 60) ? 'group4' : 'group5';
-    
-    const { keywords, description } = knowledgeBase.iri_colors[group];
-    const keywordContainer = document.getElementById('keyword-tags');
-    keywordContainer.innerHTML = '';
-    
-    keywords.forEach(keyword => {
-        const tag = document.createElement('div');
-        tag.className = 'tag tag-light';
-        tag.textContent = keyword;
-        tag.onclick = () => selectKeyword(keyword, group);
-        keywordContainer.appendChild(tag);
-    });
+    let selectedService = null;
+    let selectedPlatform = null;
+    let selectedKeywords = new Set();
+    let selectedPrimaryColor = null;
 
-    updateAIMessage(`선택하신 '${description}' 분위기에 맞는 키워드들을 확인해 보세요.`);
-}
+    let knowledgeBase = {};
 
-function selectKeyword(keyword, group) {
-    appState.keyword = keyword;
-    
-    document.querySelectorAll('#keyword-tags .tag').forEach(tag => {
-        tag.classList.toggle('selected', tag.textContent === keyword);
-        tag.classList.toggle('tag-purple', tag.textContent === keyword);
-    });
-
-    const { key_colors } = knowledgeBase.iri_colors[group];
-    const colorContainer = document.getElementById('color-selection');
-    colorContainer.innerHTML = '';
-
-    key_colors.forEach(color => {
-        const swatch = document.createElement('div');
-        swatch.className = 'color-swatch';
-        swatch.style.background = color;
-        swatch.onclick = () => selectColor(color);
-        colorContainer.appendChild(swatch);
-    });
-
-    document.getElementById('color-selection-wrapper').style.display = 'block';
-    updateAIMessage(`선택하신 '${keyword}' 키워드에 어울리는 대표 색상들을 제안합니다. 주조 색상을 선택해주세요.`);
-}
-
-function selectColor(color) {
-    appState.primaryColor = color;
-    document.querySelectorAll('.color-swatch').forEach(swatch => {
-        swatch.classList.toggle('selected', swatch.style.backgroundColor === color);
-    });
-    document.getElementById('generate-btn').classList.remove('hidden');
-    updateAIMessage("최고의 선택입니다! 이 색상을 기준으로 가이드를 생성합니다.");
-}
-
-function generateGuide() {
-    const { primaryColor, platform } = appState;
-    if (!primaryColor || !platform) {
-        alert("주조 색상과 플랫폼을 선택해주세요.");
-        return;
-    }
-
-    // --- Palette Generation ---
-    const primary = primaryColor;
-    const primaryLight = lightenColor(primary, 20);
-    const primaryDark = darkenColor(primary, 20);
-    const secondary = getComplementaryColor(primary);
-    const secondaryLight = lightenColor(secondary, 20);
-    const secondaryDark = darkenColor(secondary, 20);
-    
-    // --- Typography & Accessibility ---
-    const platformKey = platform.toLowerCase();
-    const platformGuide = knowledgeBase.guidelines[platformKey] || knowledgeBase.guidelines.web;
-    const textColorOnPrimary = getContrastRatio(primary, '#FFFFFF') > getContrastRatio(primary, '#333333') ? '#FFFFFF' : '#333333';
-    const contrastRatio = getContrastRatio(primary, textColorOnPrimary).toFixed(2) + ':1';
-    
-    // --- Store Results ---
-    appState.generatedResult = {
-        bgColor: primary,
-        textColor: textColorOnPrimary,
-        fontSize: parseInt(platformGuide.defaultSize),
-        palette: { primary, primaryLight, primaryDark, secondary, secondaryLight, secondaryDark },
-        typography: {
-            bodySize: platformGuide.defaultSize,
-            headlineSize: platformGuide.typeScale.headline || platformGuide.typeScale.largeTitle,
-            minimumSize: platformGuide.minimumSize,
-            unit: platformGuide.font.unit,
-            source: platformGuide.source
-        },
-        accessibility: {
-            textColorOnPrimary,
-            contrastRatio
-        }
-    };
-
-    displayGeneratedGuide();
-}
-
-function displayGeneratedGuide() {
-    const { palette, typography, accessibility } = appState.generatedResult;
-
-    // Color Display
-    document.getElementById('primary-main').style.background = palette.primary;
-    document.getElementById('primary-main').querySelector('.color-code').textContent = palette.primary;
-    document.getElementById('primary-light').style.background = palette.primaryLight;
-    document.getElementById('primary-light').querySelector('.color-code').textContent = palette.primaryLight;
-    document.getElementById('primary-dark').style.background = palette.primaryDark;
-    document.getElementById('primary-dark').querySelector('.color-code').textContent = palette.primaryDark;
-    
-    document.getElementById('secondary-main').style.background = palette.secondary;
-    document.getElementById('secondary-main').querySelector('.color-code').textContent = palette.secondary;
-    document.getElementById('secondary-light').style.background = palette.secondaryLight;
-    document.getElementById('secondary-light').querySelector('.color-code').textContent = palette.secondaryLight;
-    document.getElementById('secondary-dark').style.background = palette.secondaryDark;
-    document.getElementById('secondary-dark').querySelector('.color-code').textContent = palette.secondaryDark;
-
-    // Typography Display
-    document.getElementById('contrast-description').innerHTML = `Primary 색상 배경 사용 시, WCAG AA 기준을 충족하는 텍스트 색상은 <strong>${accessibility.textColorOnPrimary}</strong>이며, 대비는 <strong>${accessibility.contrastRatio}</strong>입니다.`;
-    document.getElementById('font-size-description').innerHTML = `<strong>${typography.bodySize}</strong> (본문) / <strong>${typography.headlineSize}</strong> (헤드라인)<br>최소 크기: <strong>${typography.minimumSize}</strong> / 단위: <strong>${typography.unit}</strong><br><span style="font-size: 12px; color: #888;">${typography.source}</span>`;
-
-    document.getElementById('ai-report').style.display = 'block';
-    document.getElementById('guidelines').style.display = 'grid';
-    updateAIMessage(`${appState.platform} 플랫폼에 최적화된 디자인 가이드가 생성되었습니다! 인터랙티브 실험실에서 더 자세히 테스트해보세요.`);
-}
-
-
-// ===================================================================================
-// LAB PAGE LOGIC
-// ===================================================================================
-
-function initializeLabPage() {
-    const elements = {
-        bgColorInput: document.getElementById('bg-color-input'),
-        bgColorPicker: document.getElementById('bg-color-picker'),
-        textColorInput: document.getElementById('text-color-input'),
-        textColorPicker: document.getElementById('text-color-picker'),
-        lineHeightInput: document.getElementById('line-height-input'),
-        fontSizeInput: document.getElementById('font-size-input'),
-    };
-
-    const updateAllLabDisplays = () => {
-        updateContrastDisplay();
-        updateUniversalColorDisplay();
-        updateFontUnits();
-    };
-    
-    elements.bgColorInput.oninput = (e) => { elements.bgColorPicker.value = e.target.value; updateAllLabDisplays(); };
-    elements.bgColorPicker.oninput = (e) => { elements.bgColorInput.value = e.target.value; updateAllLabDisplays(); };
-    elements.textColorInput.oninput = (e) => { elements.textColorPicker.value = e.target.value; updateAllLabDisplays(); };
-    elements.textColorPicker.oninput = (e) => { elements.textColorInput.value = e.target.value; updateAllLabDisplays(); };
-    elements.lineHeightInput.oninput = () => updateContrastDisplay();
-    elements.fontSizeInput.oninput = () => updateFontUnits();
-
-    document.querySelectorAll('input[name="cbType"]').forEach(radio => {
-        radio.addEventListener('change', updateUniversalColorDisplay);
-    });
-    
-    updateAllLabDisplays(); // Initial render
-}
-
-function updateLabPageWithData(bgColor, textColor, fontSize) {
-    document.getElementById('bg-color-input').value = bgColor;
-    document.getElementById('bg-color-picker').value = bgColor;
-    document.getElementById('text-color-input').value = textColor;
-    document.getElementById('text-color-picker').value = textColor;
-    document.getElementById('font-size-input').value = fontSize;
-    
-    updateContrastDisplay();
-    updateUniversalColorDisplay();
-    updateFontUnits();
-}
-
-function updateContrastDisplay() {
-    const bgColor = document.getElementById('bg-color-input').value;
-    const textColor = document.getElementById('text-color-input').value;
-    const lineHeight = document.getElementById('line-height-input').value;
-
-    const ratio = getContrastRatio(bgColor, textColor);
-    document.getElementById('contrast-ratio').textContent = `${ratio.toFixed(2)} : 1`;
-
-    document.getElementById('aa-status').classList.toggle('pass', ratio >= 4.5);
-    document.getElementById('aa-status').classList.toggle('fail', ratio < 4.5);
-    document.getElementById('aaa-status').classList.toggle('pass', ratio >= 7);
-    document.getElementById('aaa-status').classList.toggle('fail', ratio < 7);
-    
-    const preview = document.getElementById('text-preview');
-    preview.style.backgroundColor = bgColor;
-    preview.style.color = textColor;
-    preview.style.lineHeight = lineHeight;
-    document.getElementById('line-height-value').textContent = lineHeight;
-}
-
-function updateFontUnits() {
-    const size = document.getElementById('font-size-input').value;
-    if (!size) return;
-    
-    const pt = (parseFloat(size) * 0.75).toFixed(1); // 1px = 0.75pt
-    const rem = (parseFloat(size) / 16).toFixed(2); // assuming 1rem = 16px
-    
-    document.getElementById('pt-example').textContent = `${pt}pt`;
-    document.getElementById('rem-example').textContent = `${rem}rem`;
-    document.getElementById('sp-example').textContent = `${size}sp`; // Web에서 sp는 px와 유사하게 렌더링
-}
-
-// --- Universal Color System (in Lab) ---
-const colorBlindnessMatrices = {
-    normal: [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
-    redgreen: [[0.625, 0.375, 0], [0.7, 0.3, 0], [0, 0.3, 0.7]] // Deuteranopia
-};
-
-function updateUniversalColorDisplay() {
-    const bgColor = document.getElementById('bg-color-input').value;
-    const textColor = document.getElementById('text-color-input').value;
-    const cbType = document.querySelector('input[name="cbType"]:checked').value;
-
-    // Update Original Colors
-    updateColorBox('origBg', bgColor, textColor);
-    updateColorBox('origText', textColor, bgColor);
-
-    // Update Simulated Colors
-    const simBgColor = simulateColor(bgColor, cbType);
-    const simTextColor = simulateColor(textColor, cbType);
-    updateColorBox('simBg', simBgColor, simTextColor);
-    updateColorBox('simText', simTextColor, simBgColor);
-
-    // Update AI Solution
-    const simRatio = getContrastRatio(simBgColor, simTextColor);
-    const solutionText = document.getElementById('solution-text');
-    if (simRatio < 4.5) {
-        solutionText.innerHTML = `⚠️ <span style="font-weight:bold;">주의:</span> 시뮬레이션 결과, 대비율이 ${simRatio.toFixed(2)}:1로 낮아 구분이 어렵습니다. 명도 차이를 더 확보하거나, 아이콘/패턴 등의 사용을 고려하세요.`;
-        solutionText.style.color = '#D9534F';
-    } else {
-        solutionText.innerHTML = `✅ <span style="font-weight:bold;">양호:</span> 시뮬레이션 결과, 대비율이 ${simRatio.toFixed(2)}:1로 충분하여 색상 구분에 문제가 없을 것으로 보입니다.`;
-        solutionText.style.color = '#5CB85C';
-    }
-}
-
-function updateColorBox(id, bgColor, labelColor) {
-    const box = document.getElementById(id);
-    if (!box) return;
-    box.style.backgroundColor = bgColor;
-    box.querySelector('.hex-code-sim').textContent = bgColor.toUpperCase();
-    
-    // Set label color for readability against the box's background
-    const label = box.querySelector('.palette-label');
-    label.style.color = getContrastRatio(bgColor, '#FFFFFF') > getContrastRatio(bgColor, '#333333') ? '#FFFFFF' : '#333333';
-}
-
-function simulateColor(hex, type) {
-    const rgb = hexToRgb(hex);
-    if (!rgb || !colorBlindnessMatrices[type]) return hex;
-    
-    const matrix = colorBlindnessMatrices[type];
-    const r = Math.round(rgb.r * matrix[0][0] + rgb.g * matrix[0][1] + rgb.b * matrix[0][2]);
-    const g = Math.round(rgb.r * matrix[1][0] + rgb.g * matrix[1][1] + rgb.b * matrix[1][2]);
-    const b = Math.round(rgb.r * matrix[2][0] + rgb.g * matrix[2][1] + rgb.b * matrix[2][2]);
-    
-    return rgbToHex(
-        Math.min(255, Math.max(0, r)),
-        Math.min(255, Math.max(0, g)),
-        Math.min(255, Math.max(0, b))
-    );
-}
-
-// ===================================================================================
-// UTILITY & HELPER FUNCTIONS
-// ===================================================================================
-
-function updateAIMessage(message) {
-    const container = document.getElementById('ai-message');
-    container.innerHTML = ''; // Clear previous message
-    let i = 0;
-    const speed = 20;
-
-    function typeWriter() {
-        if (i < message.length) {
-            container.innerHTML += message.charAt(i);
-            i++;
-            setTimeout(typeWriter, speed);
-        } else {
-            container.innerHTML += '<span class="typing-cursor">|</span>';
-            setTimeout(() => {
-                 if (container.querySelector('.typing-cursor')) {
-                    container.querySelector('.typing-cursor').style.display = 'none';
-                 }
-            }, 1000);
-        }
-    }
-    typeWriter();
-}
-
-function hexToRgb(hex) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
-}
-
-function rgbToHex(r, g, b) {
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
-}
-
-function getLuminance(hex) {
-    const rgb = hexToRgb(hex);
-    if (!rgb) return 0;
-    const sRGB = [rgb.r, rgb.g, rgb.b].map(val => {
-        val /= 255;
-        return val <= 0.03928 ? val / 12.92 : Math.pow((val + 0.055) / 1.055, 2.4);
-    });
-    return sRGB[0] * 0.2126 + sRGB[1] * 0.7152 + sRGB[2] * 0.0722;
-}
-
-function getContrastRatio(color1, color2) {
-    try {
-        const lum1 = getLuminance(color1);
-        const lum2 = getLuminance(color2);
-        const lighter = Math.max(lum1, lum2);
-        const darker = Math.min(lum1, lum2);
-        return (lighter + 0.05) / (darker + 0.05);
-    } catch (e) {
-        return 1;
-    }
-}
-
-function lightenColor(color, percent) {
-    const num = parseInt(color.replace("#",""), 16);
-    const amt = Math.round(2.55 * percent);
-    const R = Math.min(255, (num >> 16) + amt);
-    const G = Math.min(255, ((num >> 8) & 0x00FF) + amt);
-    const B = Math.min(255, (num & 0x0000FF) + amt);
-    return "#" + (0x1000000 + (R << 16) | (G << 8) | B).toString(16).slice(1).toUpperCase();
-}
-
-function darkenColor(color, percent) {
-    const num = parseInt(color.replace("#",""), 16);
-    const amt = Math.round(2.55 * percent);
-    const R = Math.max(0, (num >> 16) - amt);
-    const G = Math.max(0, ((num >> 8) & 0x00FF) - amt);
-    const B = Math.max(0, (num & 0x0000FF) - amt);
-    return "#" + (0x1000000 + (R << 16) | (G << 8) | B).toString(16).slice(1).toUpperCase();
-}
-
-function getComplementaryColor(color) {
-    const rgb = hexToRgb(color);
-    if(!rgb) return '#FFFFFF';
-    const r = 255 - rgb.r;
-    const g = 255 - rgb.g;
-    const b = 255 - rgb.b;
-    return rgbToHex(r, g, b);
-}
-
-// Close dropdowns when clicking outside
-document.addEventListener('click', function(event) {
-    if (!event.target.closest('.dropdown-wrapper')) {
-        document.querySelectorAll('.dropdown-menu').forEach(menu => {
-            menu.classList.remove('show');
+    // Fetch knowledge_base.json
+    fetch('./knowledge_base.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            knowledgeBase = data;
+            setupDropdowns();
+            setupSliders(); // 슬라이더 설정도 여기에서 호출
+        })
+        .catch(error => {
+            console.error('Error loading knowledge base:', error);
+            aiMessage.innerHTML = 'AI 지식 베이스를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.';
         });
+
+    function setupDropdowns() {
+        // Service Dropdown
+        const services = Object.keys(knowledgeBase.services);
+        serviceMenu.innerHTML = '';
+        services.forEach(service => {
+            const option = document.createElement('div');
+            option.classList.add('dropdown-option');
+            option.textContent = service;
+            option.addEventListener('click', () => {
+                serviceText.textContent = service;
+                selectedService = service;
+                serviceMenu.classList.remove('show');
+                serviceDropdown.classList.add('selected');
+                showNextStep('step02');
+                loadKeywords(); // 서비스 선택 시 키워드 로드
+            });
+            serviceMenu.appendChild(option);
+        });
+
+        // Platform Dropdown
+        const platforms = Object.keys(knowledgeBase.platforms);
+        platformMenu.innerHTML = '';
+        platforms.forEach(platform => {
+            const option = document.createElement('div');
+            option.classList.add('dropdown-option');
+            option.textContent = platform;
+            option.addEventListener('click', () => {
+                platformText.textContent = platform;
+                selectedPlatform = platform;
+                platformMenu.classList.remove('show');
+                platformDropdown.classList.add('selected');
+                showNextStep('step02');
+                loadKeywords(); // 플랫폼 선택 시 키워드 로드
+            });
+            platformMenu.appendChild(option);
+        });
+
+        serviceDropdown.addEventListener('click', () => {
+            serviceMenu.classList.toggle('show');
+            platformMenu.classList.remove('show');
+        });
+
+        platformDropdown.addEventListener('click', () => {
+            platformMenu.classList.toggle('show');
+            serviceMenu.classList.remove('show');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!serviceDropdown.contains(e.target) && !serviceMenu.contains(e.target)) {
+                serviceMenu.classList.remove('show');
+            }
+            if (!platformDropdown.contains(e.target) && !platformMenu.contains(e.target)) {
+                platformMenu.classList.remove('show');
+            }
+        });
+    }
+
+    function setupSliders() {
+        // Set initial slider thumb colors
+        updateSliderThumbColor(softHardSlider);
+        updateSliderThumbColor(staticDynamicSlider);
+
+        softHardSlider.addEventListener('input', () => updateSliderThumbColor(softHardSlider));
+        staticDynamicSlider.addEventListener('input', () => updateSliderThumbColor(staticDynamicSlider));
+    }
+
+    function updateSliderThumbColor(slider) {
+        const value = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+        slider.style.background = `linear-gradient(to right, #6666ff 0%, #6666ff ${value}%, #e0e0e0 ${value}%, #e0e0e0 100%)`;
+    }
+
+    function showNextStep(stepId) {
+        const step = document.getElementById(stepId);
+        if (step) {
+            step.classList.remove('hidden');
+        }
+    }
+
+    function loadKeywords() {
+        if (!selectedService || !selectedPlatform) {
+            aiMessage.innerHTML = '서비스 목적과 OS/플랫폼을 선택하면 AI가 키워드를 추천해줍니다.';
+            keywordTagsContainer.innerHTML = '';
+            colorSelectionWrapper.style.display = 'none';
+            generateBtn.classList.add('hidden');
+            return;
+        }
+
+        aiMessage.innerHTML = `<span class="typing-cursor">|</span>`; // Typing animation start
+        let message = `"${selectedService}" 서비스와 "${selectedPlatform}" 환경에 어울리는 핵심 키워드들을 제안합니다.`;
+        typeEffect(aiMessage, message, () => {
+            aiMessage.innerHTML = message; // Remove cursor after typing
+            const serviceKeywords = knowledgeBase.services[selectedService].keywords;
+            const platformKeywords = knowledgeBase.platforms[selectedPlatform].keywords;
+
+            const combinedKeywords = [...new Set([...serviceKeywords, ...platformKeywords])]);
+
+            keywordTagsContainer.innerHTML = '';
+            selectedKeywords.clear(); // Reset selected keywords
+
+            combinedKeywords.forEach(keyword => {
+                const tag = document.createElement('span');
+                tag.classList.add('tag');
+                tag.textContent = keyword;
+                tag.addEventListener('click', () => {
+                    tag.classList.toggle('selected');
+                    if (tag.classList.contains('selected')) {
+                        selectedKeywords.add(keyword);
+                    } else {
+                        selectedKeywords.delete(keyword);
+                    }
+                    updateGenerateButtonVisibility();
+                });
+                keywordTagsContainer.appendChild(tag);
+            });
+            showNextStep('step03');
+            colorSelectionWrapper.style.display = 'block';
+            loadColorPalettes(); // 키워드 로드 후 색상 팔레트 로드
+            updateGenerateButtonVisibility();
+        });
+    }
+
+    function loadColorPalettes() {
+        colorSelection.innerHTML = '';
+        selectedPrimaryColor = null; // Reset selected color
+
+        const availablePalettes = knowledgeBase.colorPalettes;
+        const colorNames = Object.keys(availablePalettes);
+
+        colorNames.forEach(colorName => {
+            const swatch = document.createElement('div');
+            swatch.classList.add('color-swatch');
+            swatch.style.backgroundColor = availablePalettes[colorName].primary_main;
+            swatch.title = colorName; // 툴팁으로 색상 이름 표시
+            swatch.dataset.colorName = colorName; // 데이터 속성에 색상 이름 저장
+
+            swatch.addEventListener('click', () => {
+                document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+                swatch.classList.add('selected');
+                selectedPrimaryColor = colorName;
+                updateGenerateButtonVisibility();
+            });
+            colorSelection.appendChild(swatch);
+        });
+    }
+
+    function updateGenerateButtonVisibility() {
+        if (selectedService && selectedPlatform && selectedKeywords.size > 0 && selectedPrimaryColor) {
+            generateBtn.classList.remove('hidden');
+        } else {
+            generateBtn.classList.add('hidden');
+        }
+    }
+
+    function typeEffect(element, text, callback) {
+        let i = 0;
+        element.innerHTML = `<span class="typing-cursor">|</span>`;
+        const cursor = element.querySelector('.typing-cursor');
+
+        const typingInterval = setInterval(() => {
+            if (i < text.length) {
+                const currentText = text.substring(0, i + 1);
+                element.innerHTML = `${currentText}<span class="typing-cursor">|</span>`;
+                i++;
+            } else {
+                clearInterval(typingInterval);
+                if (callback) callback();
+            }
+        }, 30); // Typing speed
+    }
+
+
+    generateBtn.addEventListener('click', generateGuide);
+
+    function generateGuide() {
+        if (!selectedService || !selectedPlatform || selectedKeywords.size === 0 || !selectedPrimaryColor) {
+            aiMessage.textContent = '모든 필드를 선택해주세요!';
+            return;
+        }
+
+        aiMessage.innerHTML = `<span class="typing-cursor">|</span>`; // Typing animation start
+        let finalMessage = `선택하신 조건에 맞춰 AI 타이포그래피 디자인 가이드라인을 생성했습니다. 아래 리포트를 확인해 주세요!`;
+        typeEffect(aiMessage, finalMessage, () => {
+            aiMessage.innerHTML = finalMessage; // Remove cursor after typing
+            displayAIReport();
+        });
+    }
+
+    function displayAIReport() {
+        aiReport.style.display = 'block';
+        guidelines.style.display = 'grid'; // Enable bottom guidelines
+
+        // Color System
+        const palette = knowledgeBase.colorPalettes[selectedPrimaryColor];
+        
+        const primaryMain = document.getElementById('primary-main');
+        primaryMain.style.backgroundColor = palette.primary_main;
+        primaryMain.querySelector('.color-code').textContent = palette.primary_main;
+
+        const secondaryMain = document.getElementById('secondary-main');
+        secondaryMain.style.backgroundColor = palette.secondary_main;
+        secondaryMain.querySelector('.color-code').textContent = palette.secondary_main;
+        
+        const primaryLight = document.getElementById('primary-light');
+        primaryLight.style.backgroundColor = palette.primary_light;
+        primaryLight.querySelector('.color-code').textContent = palette.primary_light;
+        
+        const secondaryLight = document.getElementById('secondary-light');
+        secondaryLight.style.backgroundColor = palette.secondary_light;
+        secondaryLight.querySelector('.color-code').textContent = palette.secondary_light;
+        
+        const primaryDark = document.getElementById('primary-dark');
+        primaryDark.style.backgroundColor = palette.primary_dark;
+        primaryDark.querySelector('.color-code').textContent = palette.primary_dark;
+        
+        const secondaryDark = document.getElementById('secondary-dark');
+        secondaryDark.style.backgroundColor = palette.secondary_dark;
+        secondaryDark.querySelector('.color-code').textContent = palette.secondary_dark;
+
+        // Typography - Contrast Description (Static for now, can be dynamic)
+        document.getElementById('contrast-description').textContent = "WCAG 2.1 AA 등급(4.5:1) 이상을 기본으로 권장하며, AAA 등급(7:1)을 목표로 합니다. 대형 텍스트(18pt 이상 또는 굵은 글자 14pt 이상)는 3:1까지 허용됩니다.";
+
+        // Typography - Font Size Description (Dynamic based on selectedPlatform)
+        const platformTypography = knowledgeBase.platforms[selectedPlatform].typography;
+        let fontSizeText = `기본 텍스트 크기: ${platformTypography.baseFontSize}`;
+        if (platformTypography.unit === 'px') {
+            fontSizeText += ` (웹 환경 최적화)`;
+        } else if (platformTypography.unit === 'pt') {
+            fontSizeText += ` (iOS/macOS 환경 최적화)`;
+        } else if (platformTypography.unit === 'sp') {
+            fontSizeText += ` (Android 환경 최적화)`;
+        }
+        document.getElementById('font-size-description').textContent = fontSizeText;
+
+        // Update Lab page initial colors based on generated guide
+        updateLabPageColors(palette.primary_main, palette.primary_dark);
+    }
+
+    // Lab Page Logic
+    const bgColorInput = document.getElementById('bg-color-input');
+    const bgColorPicker = document.getElementById('bg-color-picker');
+    const textColorInput = document.getElementById('text-color-input');
+    const textColorPicker = document.getElementById('text-color-picker');
+    const lineheightInput = document.getElementById('line-height-input');
+    const lineHeightValue = document.getElementById('line-height-value');
+    const contrastRatioDisplay = document.getElementById('contrast-ratio');
+    const aaStatus = document.getElementById('aa-status');
+    const aaaStatus = document.getElementById('aaa-status');
+    const textPreview = document.getElementById('text-preview');
+
+    // Font Unit Comparison elements
+    const fontSizeInput = document.getElementById('font-size-input');
+    const ptExample = document.getElementById('pt-example');
+    const remExample = document.getElementById('rem-example');
+    const spExample = document.getElementById('sp-example');
+
+    // Universal Color System elements
+    const normalRadio = document.getElementById('normal');
+    const redgreenRadio = document.getElementById('redgreen');
+    const origBg = document.getElementById('origBg');
+    const origText = document.getElementById('origText');
+    const simBg = document.getElementById('simBg');
+    const simText = document.getElementById('simText');
+    const solutionText = document.getElementById('solution-text');
+
+    function initializeLabPage() {
+        // Initial setup for contrast test
+        updateContrastTestPreview();
+        
+        // Event Listeners for Contrast Test
+        bgColorInput.addEventListener('input', updateContrastTestPreview);
+        bgColorPicker.addEventListener('input', (e) => {
+            bgColorInput.value = e.target.value.toUpperCase();
+            updateContrastTestPreview();
+        });
+        textColorInput.addEventListener('input', updateContrastTestPreview);
+        textColorPicker.addEventListener('input', (e) => {
+            textColorInput.value = e.target.value.toUpperCase();
+            updateContrastTestPreview();
+        });
+        lineheightInput.addEventListener('input', (e) => {
+            lineHeightValue.textContent = e.target.value;
+            textPreview.style.lineHeight = e.target.value;
+        });
+
+        // Initialize Font Unit Comparison
+        updateFontUnitExamples();
+        fontSizeInput.addEventListener('input', updateFontUnitExamples);
+
+        // Initialize Universal Color System
+        updateColorblindSimulator();
+        normalRadio.addEventListener('change', updateColorblindSimulator);
+        redgreenRadio.addEventListener('change', updateColorblindSimulator);
+        // Also update simulator when contrast test colors change
+        bgColorInput.addEventListener('input', updateColorblindSimulator);
+        textColorInput.addEventListener('input', updateColorblindSimulator);
+    }
+
+    function updateLabPageColors(bgColor, textColor) {
+        bgColorInput.value = bgColor.toUpperCase();
+        bgColorPicker.value = bgColor.toUpperCase();
+        textColorInput.value = textColor.toUpperCase();
+        textColorPicker.value = textColor.toUpperCase();
+        updateContrastTestPreview();
+        updateColorblindSimulator();
+    }
+
+
+    function getContrastRatio(hex1, hex2) {
+        function hexToRgb(hex) {
+            const r = parseInt(hex.substring(1, 3), 16);
+            const g = parseInt(hex.substring(3, 5), 16);
+            const b = parseInt(hex.substring(5, 7), 16);
+            return [r, g, b];
+        }
+
+        function getLuminance(r, g, b) {
+            const a = [r, g, b].map(v => {
+                v /= 255;
+                return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+            });
+            return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+        }
+
+        const rgb1 = hexToRgb(hex1);
+        const rgb2 = hexToRgb(hex2);
+
+        const lum1 = getLuminance(rgb1[0], rgb1[1], rgb1[2]);
+        const lum2 = getLuminance(rgb2[0], rgb2[1], rgb2[2]);
+
+        const ratio = (Math.max(lum1, lum2) + 0.05) / (Math.min(lum1, lum2) + 0.05);
+        return ratio.toFixed(2);
+    }
+
+    // Function to determine if color is dark or light for adaptive text color
+    function isDarkColor(hex) {
+        const rgb = hexToRgbForFilter(hex);
+        // Calculate perceived luminance (ITU-R BT.709 formula)
+        const luminance = (0.2126 * rgb.r + 0.7152 * rgb.g + 0.0722 * rgb.b) / 255;
+        return luminance < 0.5; // Threshold 0.5 can be adjusted
+    }
+
+    // Function to set adaptive text color for hex codes
+    function setAdaptiveTextColor(element, bgColor) {
+        if (isDarkColor(bgColor)) {
+            element.style.color = '#FFFFFF'; // White text for dark background
+        } else {
+            element.style.color = 'rgba(0,0,0,0.8)'; // Dark text for light background
+        }
+    }
+
+    function updateContrastTestPreview() {
+        const bgColor = bgColorInput.value;
+        const textColor = textColorInput.value;
+
+        textPreview.style.backgroundColor = bgColor;
+        textPreview.style.color = textColor;
+
+        const ratio = getContrastRatio(bgColor, textColor);
+        contrastRatioDisplay.textContent = `${ratio} : 1`;
+
+        aaStatus.classList.remove('pass', 'fail');
+        aaaStatus.classList.remove('pass', 'fail');
+
+        if (parseFloat(ratio) >= 4.5) {
+            aaStatus.classList.add('pass');
+        } else {
+            aaStatus.classList.add('fail');
+        }
+
+        if (parseFloat(ratio) >= 7) {
+            aaaStatus.classList.add('pass');
+        } else {
+            aaaStatus.classList.add('fail');
+        }
+
+        // Update colorblind simulator with current colors
+        updateColorblindSimulator();
+    }
+
+    // Font Unit Conversion (New Function)
+    function updateFontUnitExamples() {
+        const basePx = parseFloat(fontSizeInput.value) || 16; // Default to 16px
+
+        // pt (1px = 0.75pt, assuming 96dpi for web comparison)
+        const ptValue = (basePx * 0.75).toFixed(1); 
+        ptExample.textContent = `${ptValue}pt`;
+        ptExample.style.fontSize = `${ptValue}pt`; // Apply actual pt size
+
+        // rem (relative to root font-size, assume root is 16px)
+        const remValue = (basePx / 16).toFixed(2);
+        remExample.textContent = `${remValue}rem`;
+        remExample.style.fontSize = `${remValue}rem`; // Apply actual rem size
+
+        // sp (Android scaled pixels, often 1sp = 1px by default, but scales with user preference)
+        spExample.textContent = `${basePx}sp`;
+        spExample.style.fontSize = `${basePx}px`; // Apply actual px size for sp
+    }
+
+
+    // Universal Color System Functions (Revised)
+    function hexToRgbForFilter(hex) {
+        const r = parseInt(hex.substring(1, 3), 16);
+        const g = parseInt(hex.substring(3, 5), 16);
+        const b = parseInt(hex.substring(5, 7), 16);
+        return { r, g, b };
+    }
+
+    function rgbToHex(r, g, b) {
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+    }
+
+    // Simplified Daltonize filter for red-green (deuteranomaly/protanomaly)
+    function simulateRedGreenColorblindness(r, g, b) {
+        const p = [
+            0.625, 0.375, 0.000,
+            0.700, 0.300, 0.000,
+            0.000, 0.300, 0.700
+        ]; // Deuteranomaly matrix
+        
+        const r_sim = (r * p[0]) + (g * p[1]) + (b * p[2]);
+        const g_sim = (r * p[3]) + (g * p[4]) + (b * p[5]);
+        const b_sim = (r * p[6]) + (g * p[7]) + (b * p[8]);
+
+        return {
+            r: Math.round(Math.min(255, Math.max(0, r_sim))),
+            g: Math.round(Math.min(255, Math.max(0, g_sim))),
+            b: Math.round(Math.min(255, Math.max(0, b_sim)))
+        };
+    }
+
+    function updateColorblindSimulator() {
+        const currentBgHex = bgColorInput.value;
+        const currentTextHex = textColorInput.value;
+
+        origBg.style.backgroundColor = currentBgHex;
+        origBg.querySelector('.hex-code-sim').textContent = currentBgHex;
+        setAdaptiveTextColor(origBg.querySelector('.hex-code-sim'), currentBgHex); // 적용
+        
+        origText.style.backgroundColor = currentTextHex;
+        origText.querySelector('.hex-code-sim').textContent = currentTextHex;
+        setAdaptiveTextColor(origText.querySelector('.hex-code-sim'), currentTextHex); // 적용
+
+        if (redgreenRadio.checked) {
+            const bgRgb = hexToRgbForFilter(currentBgHex);
+            const textRgb = hexToRgbForFilter(currentTextHex);
+
+            const simBgRgb = simulateRedGreenColorblindness(bgRgb.r, bgRgb.g, bgRgb.b);
+            const simTextRgb = simulateRedGreenColorblindness(textRgb.r, textRgb.g, textRgb.b);
+
+            const simBgHex = rgbToHex(simBgRgb.r, simBgRgb.g, simBgRgb.b);
+            const simTextHex = rgbToHex(simTextRgb.r, simTextRgb.g, simTextRgb.b);
+
+            simBg.style.backgroundColor = simBgHex;
+            simBg.querySelector('.hex-code-sim').textContent = simBgHex;
+            setAdaptiveTextColor(simBg.querySelector('.hex-code-sim'), simBgHex); // 적용
+            
+            simText.style.backgroundColor = simTextHex;
+            simText.querySelector('.hex-code-sim').textContent = simTextHex;
+            setAdaptiveTextColor(simText.querySelector('.hex-code-sim'), simTextHex); // 적용
+
+            // Update solution text based on simulated contrast
+            const simulatedRatio = getContrastRatio(simBgHex, simTextHex);
+            solutionText.innerHTML = getSolutionForColorblind(parseFloat(simulatedRatio), simulatedRatio);
+
+        } else { // Normal vision
+            simBg.style.backgroundColor = currentBgHex;
+            simBg.querySelector('.hex-code-sim').textContent = currentBgHex;
+            setAdaptiveTextColor(simBg.querySelector('.hex-code-sim'), currentBgHex); // 적용
+            
+            simText.style.backgroundColor = currentTextHex;
+            simText.querySelector('.hex-code-sim').textContent = currentTextHex;
+            setAdaptiveTextColor(simText.querySelector('.hex-code-sim'), currentTextHex); // 적용
+            
+            solutionText.innerHTML = "일반 시각으로 색상을 보고 있습니다. 색약 시뮬레이션을 통해 접근성을 확인해 보세요.";
+        }
+    }
+
+    function getSolutionForColorblind(simulatedRatio, ratioText) {
+        if (simulatedRatio < 3.0) {
+            return `<span style='color: #f44336; font-weight: 600;'>🚨 대비 부족:</span> 시뮬레이션 결과, 대비율이 ${ratioText}:1로 매우 낮아 색상 구분에 심각한 문제가 있을 것으로 예상됩니다. 텍스트 또는 배경색 중 하나를 훨씬 밝거나 어둡게 변경하여 대비를 최소 4.5:1 이상으로 높여야 합니다. 색상 자체보다는 밝기 차이가 중요합니다.`;
+        } else if (simulatedRatio < 4.5) {
+            return `<span style='color: #ff9800; font-weight: 600;'>⚠️ 개선 필요:</span> 시뮬레이션 결과, 대비율이 ${ratioText}:1로 부족하여 적록색약 환경에서 텍스트 가독성이 떨어질 수 있습니다. 텍스트 또는 배경색의 밝기를 조정하여 명도 대비를 WCAG AA 기준(4.5:1) 이상으로 높이는 것을 권장합니다.`;
+        } else {
+            return `<span style='color: #4caf50; font-weight: 600;'>✅ 양호:</span> 시뮬레이션 결과, 대비율이 ${ratioText}:1로 충분하여 적록색약 환경에서도 텍스트를 명확하게 읽을 수 있습니다. 현재 색상 조합은 접근성 기준을 충족합니다.`;
+        }
+    }
+
+    // Initial load calls
+    // Only call initializeLabPage if lab-page is active initially (unlikely, but for robustness)
+    if (labPage.classList.contains('active')) {
+        initializeLabPage();
     }
 });

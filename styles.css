@@ -125,8 +125,13 @@ body {
 
 /* Tone Selector */
 .tone-selector { background: white; padding: 30px; border-radius: 12px; border: 1px solid #e0e0e0; }
-.tone-labels, .tone-bottom-labels { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; color: #333; }
-.tone-bottom-labels { font-size: 12px; color: #666; }
+.tone-labels span, .tone-bottom-labels span { 
+    font-size: 14px; 
+    font-weight: 600; /* 세미볼드로 통일 */
+    color: #333; 
+}
+.tone-bottom-labels { font-size: 12px; color: #666; } /* 이 부분은 폰트 사이즈만 재조정 */
+
 .slider-container { margin-bottom: 30px; position: relative; }
 .slider {
     width: 100%;
@@ -228,17 +233,15 @@ body {
 .text-preview .bold-14pt { font-size: 14pt; font-weight: 700; } /* 14pt, bold */
 
 
-.font-size-input-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
+.font-size-input-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; } /* 설명과 간격 조정 */
 .font-size-input-wrapper input { width: 80px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; text-align: center; font-size: 16px; }
+.font-unit-description { font-size: 13px; color: #666; margin-bottom: 30px; line-height: 1.5; } /* 설명 스타일 */
 .font-unit-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .font-unit-card { background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; }
 .font-unit-card h4 { font-size: 14px; font-weight: 600; color: #6666ff; margin-bottom: 15px; }
 
 /* 폰트 단위별 실제 크기 반영 */
 .font-unit-card .font-example { font-weight: 500; min-height: 36px; line-height: 1.2; }
-.font-unit-card .pt-example { font-size: 24pt; /* 16px 기준 약 12pt인데, 시각적 차이를 위해 크게 설정 */ }
-.font-unit-card .rem-example { font-size: 2rem; /* 16px 기준 1rem */ }
-.font-unit-card .sp-example { font-size: 24px; /* Android sp는 px와 거의 유사 */ }
 
 
 /* Universal Color System */
@@ -249,14 +252,26 @@ body {
 .cb-option input[type="radio"]:checked + label { border-color: #6666ff; background: #f0f0ff; color: #6666ff; }
 .simulator-display { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
 .simulator-card { background: #f8f9fa; border-radius: 8px; padding: 20px; }
-.simulator-title { font-size: 14px; font-weight: 600; color: #666; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+.simulator-title { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; } /* 이모지 제거에 따른 조정 */
 .color-palette-sim { display: flex; gap: 15px; }
-.palette-item { flex: 1; height: 100px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 500; position: relative; transition: background-color 0.3s ease; }
+.palette-item { 
+    flex: 1; 
+    height: 100px; 
+    border-radius: 8px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    font-weight: 500; 
+    position: relative; 
+    transition: background-color 0.3s ease; 
+    /* color 속성은 JS에서 동적으로 제어 */
+}
 .palette-label { font-size: 14px; }
-.hex-code-sim { font-size: 11px; margin-top: 5px; opacity: 0.8; }
+.hex-code-sim { font-size: 12px; margin-top: 5px; opacity: 0.9; font-weight: 600;} /* 헥사 코드 글자 크기 키우고 굵게 */
 .solutions-section { background: #f8f9fa; padding: 25px; border-radius: 8px; }
 .solution-header { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 20px; }
-#solution-text { font-size: 14px; line-height: 1.7; transition: color 0.3s ease; }
+#solution-text { font-size: 15px; line-height: 1.7; transition: color 0.3s ease; } /* 글자 크기 키움 */
 
 /* Typing Cursor */
 .typing-cursor { font-weight: bold; color: #888; animation: blink 0.7s infinite; }
