@@ -136,7 +136,7 @@
         <div id="lab-page" class="lab-page hidden">
             <div class="main-content">
                 <div class="contrast-test">
-                    <h2 class="section-header-lab">배경-텍스트 명도 대비 실시간 테스트</h2>
+                    <h2 class="section-header-lab">색상 대비 실시간 테스트</h2>
                     <div class="color-inputs">
                         <div class="input-group">
                             <label>Background color</label>
@@ -184,11 +184,10 @@
                         <input type="number" id="font-size-input" value="16">
                         <span>px (기준)</span>
                     </div>
-                    <p class="font-unit-description">웹 환경에서 `rem`은 기준 폰트 사이즈에 따라 유동적으로 변하는 상대 단위입니다. `pt`는 인쇄 및 iOS/macOS, `sp`는 Android에서 주로 사용되는 단위입니다.</p>
                     <div class="font-unit-cards">
-                        <div class="font-unit-card"><h4>pt (for iOS/macOS)</h4><p class="font-example" id="pt-example">12pt</p></div>
-                        <div class="font-unit-card"><h4>rem (for Web)</h4><p class="font-example" id="rem-example">1rem</p></div>
-                        <div class="font-unit-card"><h4>sp (for Android)</h4><p class="font-example" id="sp-example">16sp</p></div>
+                        <div class="font-unit-card"><h4>pt (for iOS/macOS)</h4><p class="font-example pt-example" id="pt-example">고정 크기 텍스트 예시</p></div>
+                        <div class="font-unit-card"><h4>rem (for Web)</h4><p class="font-example rem-example" id="rem-example">고정 크기 텍스트 예시</p></div>
+                        <div class="font-unit-card"><h4>sp (for Android)</h4><p class="font-example sp-example" id="sp-example">고정 크기 텍스트 예시</p></div>
                     </div>
                 </div>
 
@@ -206,14 +205,14 @@
                     </div>
                     <div class="simulator-display">
                         <div class="simulator-card">
-                            <div class="simulator-title">원본 색상</div>
+                            <div class="simulator-title"><span>🎨</span> 원본 색상</div>
                             <div class="color-palette-sim">
                                 <div class="palette-item" id="origBg"><span class="palette-label">배경</span><span class="hex-code-sim"></span></div>
                                 <div class="palette-item" id="origText"><span class="palette-label">텍스트</span><span class="hex-code-sim"></span></div>
                             </div>
                         </div>
                         <div class="simulator-card">
-                            <div class="simulator-title">시뮬레이션 결과</div>
+                            <div class="simulator-title"><span>🔄</span> 시뮬레이션 결과</div>
                             <div class="color-palette-sim">
                                 <div class="palette-item" id="simBg"><span class="palette-label">배경</span><span class="hex-code-sim"></span></div>
                                 <div class="palette-item" id="simText"><span class="palette-label">텍스트</span><span class="hex-code-sim"></span></div>
