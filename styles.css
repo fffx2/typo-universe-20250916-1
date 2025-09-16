@@ -67,10 +67,11 @@ body {
     margin-bottom: 60px;
 }
 
-/* Lab 페이지는 1단 레이아웃 */
+/* ======[ 핵심 수정 사항 ]====== */
 #lab-page .main-content {
-    display: block; 
+    display: block; /* Lab 페이지는 1단 레이아웃으로 변경 */
 }
+/* ============================ */
 
 
 /* Step Sections */
@@ -182,64 +183,22 @@ body {
 .color-input-wrapper { display: flex; align-items: center; gap: 10px; height: 48px; }
 .color-input { flex: 1; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; font-family: inherit; font-size: 16px; }
 .color-picker { width: 48px; height: 48px; border: 1px solid #e0e0e0; border-radius: 8px; cursor: pointer; padding: 4px; }
-
-/* 명도 대비 레이아웃 */
-.contrast-display-wrapper {
-    display: flex; /* 요소들을 한 줄에 배치 */
-    align-items: center; /* 세로 중앙 정렬 */
-    gap: 15px; /* 요소들 간 간격 */
-    padding: 20px;
-    background: #f8f8f8;
-    border-radius: 8px;
-    margin-bottom: 20px;
-}
-.contrast-ratio { 
-    font-size: 32px; 
-    font-weight: 700; 
-    color: #333; 
-    white-space: nowrap; /* 숫자가 줄바꿈되지 않도록 */
-}
-.contrast-info-group {
-    display: flex;
-    flex-direction: column; /* AA/AAA 배지와 텍스트를 세로로 쌓음 */
-    gap: 8px;
-    flex-grow: 1; /* 남은 공간을 채우도록 */
-}
+.contrast-display { display: flex; align-items: center; gap: 20px; padding: 20px; background: #f8f8f8; border-radius: 8px; margin-bottom: 20px; }
+.contrast-ratio { font-size: 32px; font-weight: 700; color: #333; }
 .contrast-status { display: flex; gap: 10px; }
-
 .contrast-info { font-size: 12px; color: #888; line-height: 1.5; }
 .status-badge { padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: 600; }
 .status-badge.pass { background: #4caf50; color: white; }
 .status-badge.fail { background: #f44336; color: white; }
-
-.text-preview { 
-    padding: 30px; 
-    border-radius: 8px; 
-    margin-bottom: 20px; 
-    transition: all 0.3s; 
-    background-color: #FFF0F0; /* 요청 이미지와 유사한 배경색 */
-    line-height: 1.7;
-}
-
-/* 텍스트 미리보기 글자 크기/굵기 (재수정) */
-.text-preview .preview-line { margin-bottom: 5px; color: #A00000; }
-.text-preview .regular-16pt { font-size: 16pt; font-weight: 400; } /* 16pt, regular */
-.text-preview .regular-18pt { font-size: 18pt; font-weight: 400; } /* 18pt, regular */
-.text-preview .bold-14pt { font-size: 14pt; font-weight: 700; } /* 14pt, bold */
-
-
+.text-preview { padding: 30px; border-radius: 8px; margin-bottom: 20px; transition: all 0.3s; }
+.preview-title { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+.preview-body { font-size: 16px; }
 .font-size-input-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
 .font-size-input-wrapper input { width: 80px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; text-align: center; font-size: 16px; }
 .font-unit-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .font-unit-card { background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; }
 .font-unit-card h4 { font-size: 14px; font-weight: 600; color: #6666ff; margin-bottom: 15px; }
-
-/* 폰트 단위별 실제 크기 반영 */
-.font-unit-card .font-example { font-weight: 500; min-height: 36px; line-height: 1.2; }
-.font-unit-card .pt-example { font-size: 24pt; /* 16px 기준 약 12pt인데, 시각적 차이를 위해 크게 설정 */ }
-.font-unit-card .rem-example { font-size: 2rem; /* 16px 기준 1rem */ }
-.font-unit-card .sp-example { font-size: 24px; /* Android sp는 px와 거의 유사 */ }
-
+.font-unit-card .font-example { font-size: 24px; font-weight: 500; min-height: 36px; }
 
 /* Universal Color System */
 .colorblind-selector { display: flex; gap: 15px; margin-bottom: 30px; }
@@ -267,8 +226,4 @@ body {
     #main-page .main-content, .color-inputs, .bottom-guidelines, .font-unit-cards, .simulator-display { grid-template-columns: 1fr; gap: 20px; }
     .header { flex-direction: column; gap: 20px; text-align: center; }
     .typography-content { grid-template-columns: 1fr; }
-    
-    /* 명도 대비 레이아웃 모바일 반응형 */
-    .contrast-display-wrapper { flex-direction: column; align-items: flex-start; gap: 10px; }
-    .contrast-info-group { width: 100%; }
 }
