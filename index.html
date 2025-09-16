@@ -160,22 +160,20 @@
                             </div>
                         </div>
                     </div>
-                    <div class="contrast-display">
-                        <div class="contrast-ratio-wrapper">
-                            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">텍스트-배경 명도대비</div>
-                            <div class="contrast-ratio" id="contrast-ratio">12.36 : 1</div>
-                        </div>
-                        <div class="contrast-status-wrapper">
+                    <div class="contrast-display-wrapper">
+                        <div class="contrast-ratio" id="contrast-ratio">12.36 : 1</div>
+                        <div class="contrast-info-group">
                             <div class="contrast-status">
                                 <span class="status-badge pass" id="aa-status">AA</span>
                                 <span class="status-badge pass" id="aaa-status">AAA</span>
                             </div>
-                            <p class="contrast-info">WCAG 2.1 기준, 일반 텍스트는 4.5:1(AA), 7:1(AAA) 이상이어야 합니다.</p>
+                            <p class="contrast-info">WCAG 2.1 기준, 일반 텍스트는 4.5:1(AA), 7:1(AAA) 이상이어야 합니다. 기준 충족 시 초록색으로 표시되며, 미달일 경우 빨간색으로 표시됩니다.</p>
                         </div>
                     </div>
                     <div class="text-preview" id="text-preview">
-                        <div class="preview-title">대형 텍스트는 일반 글자인 경우 18pt(24px) 이상,</div>
-                        <div class="preview-body">굵은 글꼴일 경우 14pt 이상에 적용 됩니다.</div>
+                        <p class="preview-line regular-16pt">일반 텍스트의 명도 대비는 최소 4.5:1 이상을 권장합니다.</p>
+                        <p class="preview-line regular-18pt">대형 텍스트는 일반 글자 18pt(24px) 이상,</p>
+                        <p class="preview-line bold-14pt">굵은 글자 14pt(18.5px) 이상일 경우 배경과의 명도 대비를 3:1까지 낮출 수 있습니다.</p>
                     </div>
                 </div>
                 
@@ -187,9 +185,9 @@
                         <span>px (기준)</span>
                     </div>
                     <div class="font-unit-cards">
-                        <div class="font-unit-card"><h4>pt (for iOS)</h4><p class="font-example" id="pt-example">고정 크기 텍스트 예시</p></div>
-                        <div class="font-unit-card"><h4>rem (for Web)</h4><p class="font-example" id="rem-example">고정 크기 텍스트 예시</p></div>
-                        <div class="font-unit-card"><h4>sp (for Android)</h4><p class="font-example" id="sp-example">고정 크기 텍스트 예시</p></div>
+                        <div class="font-unit-card"><h4>pt (for iOS/macOS)</h4><p class="font-example pt-example" id="pt-example">고정 크기 텍스트 예시</p></div>
+                        <div class="font-unit-card"><h4>rem (for Web)</h4><p class="font-example rem-example" id="rem-example">고정 크기 텍스트 예시</p></div>
+                        <div class="font-unit-card"><h4>sp (for Android)</h4><p class="font-example sp-example" id="sp-example">고정 크기 텍스트 예시</p></div>
                     </div>
                 </div>
 
