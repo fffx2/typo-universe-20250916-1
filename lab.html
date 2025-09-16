@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인터랙티브 실험실 - TYPOUNIVERSE</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <link rel="stylesheet" href="./styles.css">
+    <style>
+        /* 유니버설 컬러 시스템 추가 스타일 */
+        .universal-color-system {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            margin-top: 40px;
+        }
+
+        .colorblind-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .cb-option {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .cb-option input[type="radio"] {
+            display: none;
+        }
+
+        .cb-option label {
+            display: block;
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .cb-option input[type="radio"]:checked + label {
+            border-color: #6666ff;
+            background: #f0f0ff;
+            color: #6666ff;
+        }
+
+        .cb-option label:hover {
+            border-color: #ddd;
+        }
+
+        .simulator-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .simulator-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .simulator-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .color-palette-sim {
+            display: flex;
+            gap: 15px;
+        }
+
+        .palette-item {
+            flex: 1;
+            height: 100px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .palette-label {
+            font-size: 14px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .hex-code-sim {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: 'Pretendard Variable', monospace;
+            z-index: 2;
+        }
+
+        .pattern-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            border-radius: 6px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .pattern-overlay.active {
+            opacity: 1;
+        }
+
+        .solutions-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+        }
+
+        .solution-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .warning-message {
+            display: none;
+            padding: 15px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #856404;
+        }
+
+        .warning-message.active {
+            display: block;
+        }
+
+        .suggested-colors {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .suggested-color {
+            background: white;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .suggested-color:hover {
+            border-color: #6666ff;
+            transform: translateY(-2px);
+        }
+
+        .suggested-color-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            margin: 0 auto 8px;
+        }
+
+        .suggested-color-hex {
+            font-size: 11px;
+            font-family: 'Pretendard Variable', monospace;
+            color: #666;
+        }
+
+        .pattern-controls {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .pattern-toggle {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            display: none;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #ccc;
+            transition: 0.4s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background: #6666ff;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .toggle-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .pattern-selector {
+            display: none;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .pattern-selector.active {
+            display: grid;
+        }
+
+        .pattern-option {
+            aspect-ratio: 1;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pattern-option:hover,
+        .pattern-option.selected {
+            border-color: #6666ff;
+        }
+
+        .pattern-option.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20px;
+            color: #6666ff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-left">
+                <a href="./index.html" class="nav-link">AI 타이포그래피 디자인가이드</a>
+                <a href="./lab.html" class="nav-link active">인터랙티브 실험실</a>
+            </div>
+            <div class="header-right">
+                <span class="typouniverse-logo">TYPOUNIVERSE</span>
+            </div>
+        </header>
+
+        <div class="lab-page active">
+            <!-- 기존 색상 대비 테스트 섹션 -->
+            <div class="contrast-test">
+                <h2 class="section-header-lab">색상 대비 실시간 테스트</h2>
+                
+                <div class="color-inputs">
+                    <div class="input-group">
+                        <label>Background color</label>
+                        <div class="color-input-wrapper">
+                            <input type="text" class="color-input" id="bg-color-input" value="#F5F5F5">
+                            <input type="color" class="color-picker" id="bg-color-picker" value="#F5F5F5">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Text color</label>
+                        <div class="color-input-wrapper">
+                            <input type="text" class="color-input" id="text-color-input" value="#333333">
+                            <input type="color" class="color-picker" id="text-color-picker" value="#333333">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Line height</label>
+                        <div class="slider-container lab-slider">
+                            <input type="range" class="slider" min="1" max="2.5" step="0.1" value="1.6" id="line-height-input">
+                        </div>
+                        <div style="text-align: center; margin-top: 5px;">
+                            <span id="line-height-value">1.6</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contrast-display">
+                    <div class="contrast-ratio-wrapper">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 5px;">텍스트-배경 명도대비</div>
+                        <div class="contrast-ratio" id="contrast-ratio">12.36 : 1</div>
+                    </div>
+                    <div class="contrast-status-wrapper">
+                        <div class="contrast-status">
+                            <span class="status-badge pass" id="aa-status">AA</span>
+                            <span class="status-badge pass" id="aaa-status">AAA</span>
+                        </div>
+                        <p class="contrast-info">WCAG 2.1 기준, 일반 텍스트는 4.5:1(AA), 7:1(AAA) 이상이어야 합니다.<br>기준 충족 시 초록색으로 표시되며, 미달일 경우 빨간색으로 표시됩니다.</p>
+                    </div>
+                </div>
+
+                <div class="text-preview" id="large-preview">
+                    <div class="preview-title">대형 텍스트는 일반 글자인 경우 18pt(24px) 이상,</div>
+                    <div class="preview-body">굵은 글꼴일 경우 14pt 이상에 적용 됩니다.</div>
+                </div>
+
+                <div class="text-preview" id="small-preview">
+                    <div class="preview-body">일반 텍스트는 일반 글자인 경우 16pt 이하,<br>굵은 글꼴일 경우 12pt 이하에 적용됩니다.</div>
+                </div>
+            </div>
+
+            <!-- 기존 폰트 단위 섹션 -->
+            <div class="bottom-font-units">
+                <h2 class="section-header-lab">플랫폼별 폰트 단위 비교</h2>
+                <div class="font-size-input-wrapper">
+                    <label for="font-size-input">Font size</label>
+                    <input type="number" id="font-size-input" value="16">
+                </div>
+                <div class="font-unit-cards">
+                    <div class="font-unit-card">
+                        <h4>pt_point</h4>
+                        <p class="font-example" id="pt-example">고정 크기 텍스트 예시</p>
+                        <span>for MacOS / iOS</span>
+                    </div>
+                    <div class="font-unit-card">
+                        <h4>px_pixel</h4>
+                        <p class="font-example" id="px-example">고정 크기 텍스트 예시</p>
+                        <span>for Screen</span>
+                    </div>
+                    <div class="font-unit-card">
+                        <h4>sp, dp</h4>
+                        <p class="font-example" id="sp-example">고정 크기 텍스트 예시</p>
+                        <span>for Android</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 새로운 유니버설 컬러 시스템 섹션 추가 -->
+            <div class="universal-color-system">
+                <h2 class="section-header-lab">색약자를 위한 유니버설 컬러 시스템</h2>
+                
+                <!-- 색약 유형 선택 -->
+                <div class="colorblind-selector">
+                    <div class="cb-option">
+                        <input type="radio" id="normal" name="cbType" value="normal" checked>
+                        <label for="normal">일반 시각</label>
+                    </div>
+                    <div class="cb-option">
+                        <input type="radio" id="protanopia" name="cbType" value="protanopia">
+                        <label for="protanopia">적색맹 (Protanopia)</label>
+                    </div>
+                    <div class="cb-option">
+                        <input type="radio" id="deuteranopia" name="cbType" value="deuteranopia">
+                        <label for="deuteranopia">녹색맹 (Deuteranopia)</label>
+                    </div>
+                    <div class="cb-option">
+                        <input type="radio" id="tritanopia" name="cbType" value="tritanopia">
+                        <label for="tritanopia">청색맹 (Tritanopia)</label>
+                    </div>
+                    <div class="cb-option">
+                        <input type="radio" id="achromatopsia" name="cbType" value="achromatopsia">
+                        <label for="achromatopsia">전색맹 (Achromatopsia)</label>
+                    </div>
+                </div>
+
+                <!-- 시뮬레이터 디스플레이 -->
+                <div class="simulator-display">
+                    <div class="simulator-card">
+                        <div class="simulator-title">
+                            <span>🎨</span> 원본 색상
+                        </div>
+                        <div class="color-palette-sim">
+                            <div class="palette-item" id="origBg">
+                                <span class="palette-label">배경</span>
+                                <span class="hex-code-sim">#F5F5F5</span>
+                            </div>
+                            <div class="palette-item" id="origText">
+                                <span class="palette-label">텍스트</span>
+                                <span class="hex-code-sim">#333333</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="simulator-card">
+                        <div class="simulator-title">
+                            <span>🔄</span> 시뮬레이션 결과
+                        </div>
+                        <div class="color-palette-sim">
+                            <div class="palette-item" id="simBg">
+                                <span class="palette-label">배경</span>
+                                <span class="hex-code-sim">#F5F5F5</span>
+                                <div class="pattern-overlay" id="bgPattern"></div>
+                            </div>
+                            <div class="palette-item" id="simText">
+                                <span class="palette-label">텍스트</span>
+                                <span class="hex-code-sim">#333333</span>
+                                <div class="pattern-overlay" id="textPattern"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 접근성 솔루션 -->
+                <div class="solutions-section">
+                    <div class="solution-header">접근성 솔루션</div>
+                    
+                    <div class="warning-message" id="warningMsg">
+                        ⚠️ 색상 구분이 어렵습니다. 다음 대체 색상을 고려해보세요.
+                    </div>
+
+                    <div class="suggested-colors" id="suggestedColors"></div>
+
+                    <div class="pattern-controls">
+                        <div class="pattern-toggle">
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="patternToggle">
+                                <label class="toggle-slider" for="patternToggle"></label>
+                            </div>
+                            <label class="toggle-label" for="patternToggle">패턴으로 구분하기</label>
+                        </div>
+
+                        <div class="pattern-selector" id="patternSelector">
+                            <div class="pattern-option selected" data-pattern="stripes" 
+                                 style="background: repeating-linear-gradient(45deg, #e0e0e0, #e0e0e0 10px, #f0f0f0 10px, #f0f0f0 20px);"></div>
+                            <div class="pattern-option" data-pattern="dots" 
+                                 style="background: radial-gradient(circle at 5px 5px, #e0e0e0 2px, transparent 2px); background-size: 15px 15px; background-color: #f0f0f0;"></div>
+                            <div class="pattern-option" data-pattern="grid" 
+                                 style="background-image: linear-gradient(#e0e0e0 1px, transparent 1px), linear-gradient(90deg, #e0e0e0 1px, transparent 1px); background-size: 20px 20px; background-color: #f0f0f0;"></div>
+                            <div class="pattern-option" data-pattern="diagonal" 
+                                 style="background: repeating-linear-gradient(-45deg, #e0e0e0, #e0e0e0 10px, #f0f0f0 10px, #f0f0f0 20px);"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="./lab.js"></script>
+    <script src="./universal-color.js"></script>
+</body>
+</html>
