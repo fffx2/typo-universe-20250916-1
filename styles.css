@@ -67,11 +67,9 @@ body {
     margin-bottom: 60px;
 }
 
-/* ======[ 핵심 수정 사항 ]====== */
 #lab-page .main-content {
-    display: block; /* Lab 페이지는 1단 레이아웃으로 변경 */
+    display: block; 
 }
-/* ============================ */
 
 
 /* Step Sections */
@@ -126,8 +124,13 @@ body {
 
 /* Tone Selector */
 .tone-selector { background: white; padding: 30px; border-radius: 12px; border: 1px solid #e0e0e0; }
-.tone-labels, .tone-bottom-labels { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; color: #333; }
+.tone-labels span, .tone-bottom-labels span { 
+    font-size: 14px; 
+    font-weight: 600;
+    color: #333; 
+}
 .tone-bottom-labels { font-size: 12px; color: #666; }
+
 .slider-container { margin-bottom: 30px; position: relative; }
 .slider {
     width: 100%;
@@ -183,39 +186,113 @@ body {
 .color-input-wrapper { display: flex; align-items: center; gap: 10px; height: 48px; }
 .color-input { flex: 1; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; font-family: inherit; font-size: 16px; }
 .color-picker { width: 48px; height: 48px; border: 1px solid #e0e0e0; border-radius: 8px; cursor: pointer; padding: 4px; }
-.contrast-display { display: flex; align-items: center; gap: 20px; padding: 20px; background: #f8f8f8; border-radius: 8px; margin-bottom: 20px; }
-.contrast-ratio { font-size: 32px; font-weight: 700; color: #333; }
+
+/* 명도 대비 레이아웃 */
+.contrast-display-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: #f8f8f8;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+.contrast-ratio { 
+    font-size: 32px; 
+    font-weight: 700; 
+    color: #333; 
+    white-space: nowrap;
+}
+.contrast-info-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-grow: 1;
+}
 .contrast-status { display: flex; gap: 10px; }
+
 .contrast-info { font-size: 12px; color: #888; line-height: 1.5; }
 .status-badge { padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: 600; }
 .status-badge.pass { background: #4caf50; color: white; }
 .status-badge.fail { background: #f44336; color: white; }
-.text-preview { padding: 30px; border-radius: 8px; margin-bottom: 20px; transition: all 0.3s; }
-.preview-title { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
-.preview-body { font-size: 16px; }
-.font-size-input-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
+
+.text-preview { 
+    padding: 30px; 
+    border-radius: 8px; 
+    margin-bottom: 20px; 
+    transition: all 0.3s; 
+    background-color: #FFF0F0;
+    line-height: 1.7;
+}
+
+/* 텍스트 미리보기 글자 크기/굵기 */
+.text-preview .preview-line { margin-bottom: 5px; color: #A00000; }
+.text-preview .regular-16pt { font-size: 16pt; font-weight: 400; }
+.text-preview .regular-18pt { font-size: 18pt; font-weight: 400; }
+.text-preview .bold-14pt { font-size: 14pt; font-weight: 700; }
+
+
+/* 폰트 단위 비교 섹션 */
+.font-size-input-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .font-size-input-wrapper input { width: 80px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; text-align: center; font-size: 16px; }
+.font-unit-description { font-size: 13px; color: #666; margin-bottom: 30px; line-height: 1.5; }
 .font-unit-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .font-unit-card { background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; }
 .font-unit-card h4 { font-size: 14px; font-weight: 600; color: #6666ff; margin-bottom: 15px; }
-.font-unit-card .font-example { font-size: 24px; font-weight: 500; min-height: 36px; }
+
+.font-unit-card .font-example { font-weight: 500; min-height: 36px; line-height: 1.2; font-size: 24px; }
+
 
 /* Universal Color System */
 .colorblind-selector { display: flex; gap: 15px; margin-bottom: 30px; }
 .cb-option { flex: 1; }
 .cb-option input[type="radio"] { display: none; }
-.cb-option label { display: block; padding: 12px 20px; background: #f8f9fa; border: 2px solid transparent; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.3s ease; font-size: 14px; font-weight: 500; }
-.cb-option input[type="radio"]:checked + label { border-color: #6666ff; background: #f0f0ff; color: #6666ff; }
+.cb-option label {
+    display: block;
+    padding: 12px 20px;
+    background: #f8f9fa;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+}
+.cb-option input[type="radio"]:checked + label {
+    border-color: #6666ff;
+    background: #f0f0ff;
+    color: #6666ff;
+}
 .simulator-display { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
 .simulator-card { background: #f8f9fa; border-radius: 8px; padding: 20px; }
-.simulator-title { font-size: 14px; font-weight: 600; color: #666; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+.simulator-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 .color-palette-sim { display: flex; gap: 15px; }
-.palette-item { flex: 1; height: 100px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 500; position: relative; transition: background-color 0.3s ease; }
+.palette-item { 
+    flex: 1; 
+    height: 100px; 
+    border-radius: 8px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    font-weight: 500; 
+    position: relative; 
+    transition: background-color 0.3s ease; 
+}
 .palette-label { font-size: 14px; }
-.hex-code-sim { font-size: 11px; margin-top: 5px; opacity: 0.8; }
+.hex-code-sim { font-size: 12px; margin-top: 5px; opacity: 0.9; font-weight: 600;}
 .solutions-section { background: #f8f9fa; padding: 25px; border-radius: 8px; }
 .solution-header { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 20px; }
-#solution-text { font-size: 14px; line-height: 1.7; transition: color 0.3s ease; }
+#solution-text { font-size: 15px; line-height: 1.7; transition: color 0.3s ease; }
 
 /* Typing Cursor */
 .typing-cursor { font-weight: bold; color: #888; animation: blink 0.7s infinite; }
@@ -226,4 +303,7 @@ body {
     #main-page .main-content, .color-inputs, .bottom-guidelines, .font-unit-cards, .simulator-display { grid-template-columns: 1fr; gap: 20px; }
     .header { flex-direction: column; gap: 20px; text-align: center; }
     .typography-content { grid-template-columns: 1fr; }
+    
+    .contrast-display-wrapper { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .contrast-info-group { width: 100%; }
 }
